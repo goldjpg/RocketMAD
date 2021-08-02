@@ -246,8 +246,8 @@ class ImageGenerator:
                                    if evolution > 0 else '')
             out_filename = (
                 path_generated_gym / "{}_L{}_R{}_P{}{}{}{}.png".format(
-                    team, level, raid_level, pkm, form_extension,
-                    costume_extension, evolution_extension))
+                team, level, raid_level, pkm, form_extension,
+                costume_extension, evolution_extension))
             im_lines.extend(self._draw_raid_pokemon(pkm, form, costume,
                                                     evolution))
             im_lines.extend(self._draw_raid_level(raid_level))
@@ -402,12 +402,12 @@ class ImageGenerator:
         if should_use_asset_bundle_suffix:
             assets_fullname = (
                 self.pokemon_icon_path / 'pokemon_icon{}{}.png'.format(
-                    gender_form_asset_suffix, shiny_suffix))
+                gender_form_asset_suffix, shiny_suffix))
         else:
             assets_fullname = (
                 self.pokemon_icon_path / 'pokemon_icon_{:03d}{}{}{}.png'
-                    .format(pkm, gender_form_asset_suffix,
-                            costume_asset_suffix, shiny_suffix))
+                .format(pkm, gender_form_asset_suffix,
+                        costume_asset_suffix, shiny_suffix))
 
         if classifier:
             target_path = path_generated / 'pokemon_{}'.format(classifier)
@@ -434,7 +434,7 @@ class ImageGenerator:
                                             gender=MALE, form=form,
                                             costume=costume,
                                             evolution=evolution, shiny=shiny,
-                                            weather=weather,)
+                                            weather=weather, )
 
     def _draw_gym_subject(self, image, size, gravity='north', trim=False):
         trim_cmd = ' -fuzz 0.5% -trim +repage' if trim else ''

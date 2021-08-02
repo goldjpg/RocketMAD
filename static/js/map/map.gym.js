@@ -182,98 +182,184 @@ function updateGymMarker(gym, marker, isNotifGym) {
 
 function updateGymSidebar(id) {
     const gym = mapData.gyms[id]
-    const teamName = gymTypes[gym.team_id]
-    const title = gym.name !== null && gym.name !== '' ? gym.name : (gym.team_id === 0 ? teamName : teamName + ' Gym')
-    let exIcon = ''
-    if (gym.is_ex_raid_eligible) {
-        exIcon += ` <img id="sidebar-gym-ex-icon" src="static/images/gym/ex.png" title="${i18n('EX eligible Gym')}">`
-    }
+    var sidebar = document.querySelector('#gym-sidebar')
+    var sidebarClose
 
-    $('#sidebar-gym-title').html(title + exIcon)
+    sidebar.classList.add('visible')
 
-    const $image = $('#sidebar-gym-image')
-    if (gym.url) {
-        const url = gym.url.replace(/^http:\/\//i, '//')
-        $image.attr('src', url)
-        $image.attr('class', 'gym-image')
-        $image.addClass(teamName.toLowerCase())
-        $image.attr('onclick', `showImageModal('${url}', '${title.replace(/"/g, '\\&quot;').replace(/'/g, '\\&#39;')}')`)
-    } else {
-        let url = `gym_img?team=${teamName}&level=${getGymLevel(gym)}`
-        if (gym.is_in_battle) {
-            url += '&in_battle=1'
-        }
-        $image.removeClass('gym-image')
-        $image.removeAttr('onclick')
-        $image.attr('src', url)
-    }
+    var data = $.ajax({
+        url: 'get-gym',
+        type: 'GET',
+        data: {
+            'id': id
+        },
+        dataType: 'json',
+        cache: false
+    })
 
-    const $team = $('#gym-sidebar .team')
-    if (gym.slots_available < 6) {
-        $team.text(i18n('Team ' + teamName))
-    } else {
-        $team.text(i18n(teamName))
-    }
-    $team.attr('class', 'team')
-    $team.addClass(teamName.toLowerCase())
-
-    $('#sidebar-gym-free-slots').text(gym.slots_available)
-    if (gym.slots_available < 6) {
-        $('#sidebar-gym-leader').html(`${getPokemonName(gym.guard_pokemon_id)} <a href='https://pokemongo.gamepress.gg/pokemon/${gym.guard_pokemon_id}' target='_blank' title='${i18n('View on GamePress')}'>#${gym.guard_pokemon_id}</a>`)
-        $('#sidebar-gym-leader-container').show()
-    } else {
-        $('#sidebar-gym-leader-container').hide()
-    }
-    $('#sidebar-gym-last-scanned').text(timestampToDateTime(gym.last_scanned))
-    $('#sidebar-gym-last-modified').text(timestampToDateTime(gym.last_modified))
-    $('#sidebar-gym-coordinates-container').html(`<a href='javascript:void(0);' onclick='javascript:openMapDirections(${gym.latitude},${gym.longitude},"${settings.mapServiceProvider}");' title='${i18n('Open in')} ${mapServiceProviderNames[settings.mapServiceProvider]}'><i class="fas fa-map-marked-alt"></i> ${gym.latitude.toFixed(5)}, ${gym.longitude.toFixed(5)}</a>`)
-
-    if (isGymMeetsRaidFilters(gym)) {
-        const raid = gym.raid
-        const levelStars = '★'.repeat(raid.level)
-
-        if (isOngoingRaid(raid) && raid.pokemon_id) {
-            const name = getPokemonNameWithForm(raid.pokemon_id, raid.form, raid.evolution)
-            const fastMoveName = getMoveName(raid.move_1)
-            const chargeMoveName = getMoveName(raid.move_2)
-            const fastMoveType = getMoveTypeNoI8ln(raid.move_1)
-            const chargeMoveType = getMoveTypeNoI8ln(raid.move_2)
-
-            $('#sidebar-upcoming-raid-container').hide()
-            $('#sidebar-ongoing-raid-title').html(`${name} <i class='fas ${genderClasses[raid.gender - 1]}'></i> #${raid.pokemon_id}`)
-            $('#sidebar-ongoing-raid-level-container').html(`${i18n('Raid')} <span class='raid-level-${raid.level}'>${levelStars}</span>`)
-            $('#sidebar-ongoing-raid-end-container').html(`${timestampToTime(raid.end)} (<span class='label-countdown' disappears-at='${raid.end}'>00m00s</span>)`)
-            $('#sidebar-raid-pokemon-image').attr('src', getPokemonRawIconUrl(raid, serverSettings.generateImages))
-
-            let typesDisplay = ''
-            const types = getPokemonTypesNoI8ln(raid.pokemon_id, raid.form)
-            $.each(types, function (index, type) {
-                if (index === 1) {
-                    typesDisplay += `<img src='static/images/types/${type.type.toLowerCase()}.png' title='${i18n(type.type)}' width='24' style='margin-left:4px;'>`
-                } else {
-                    typesDisplay += `<img src='static/images/types/${type.type.toLowerCase()}.png' title='${i18n(type.type)}' width='24'>`
-                }
+    data.done(function (result) {
+        var pokemonHtml = ''
+        if (result.length) {
+            result.forEach((pokemon) => {
+                pokemonHtml += getSidebarGymMember(pokemon)
             })
-            $('#sidebar-raid-types-container').html(typesDisplay)
 
-            $('#sidebar-raid-cp').text(raid.cp)
-            $('#sidebar-raid-fast-move').html(`${fastMoveName} <img class='move-type-icon' src='static/images/types/${fastMoveType.toLowerCase()}.png' title='${i18n(fastMoveType)}' width='15'>`)
-            $('#sidebar-raid-charge-move').html(`${chargeMoveName} <img class='move-type-icon' src='static/images/types/${chargeMoveType.toLowerCase()}.png' title='${i18n(chargeMoveType)}' width='15'>`)
-            $('#sidebar-ongoing-raid-container').show()
+            pokemonHtml = `<table><tbody>${pokemonHtml}</tbody></table>`
+        } else if (gym.team_id === 0) {
+            pokemonHtml = ''
         } else {
-            $('#sidebar-ongoing-raid-container').hide()
-            $('#sidebar-upcoming-raid-title').html(`${i18n('Raid')} <span class='raid-level-${raid.level}'>${levelStars}</span>`)
-            $('#sidebar-raid-egg-image').attr('src', 'static/images/gym/' + raidEggImages[raid.level])
-            $('#sidebar-upcoming-raid-start-container').html(`${i18n('Start')}: ${timestampToTime(raid.start)} (<span class='label-countdown' disappears-at='${raid.start}'>00m00s</span>)`)
-            $('#sidebar-upcoming-raid-end-container').html(`${i18n('End')}: ${timestampToTime(raid.end)} (<span class='label-countdown' disappears-at='${raid.end}'>00m00s</span>)`)
-            $('#sidebar-upcoming-raid-container').show()
+            pokemonHtml = `
+                <center>
+                    Gym Leader:<br>
+                    <i class="pokemon-large-sprite n${gym.guard_pokemon_id}"></i><br>
+                    <b>${gym.guard_pokemon_name}</b>
+                    <p style="font-size: .75em; margin: 5px;">
+                        No additional gym information is available for this gym. Make sure you are collecting <a href="https://rocketmap.readthedocs.io/en/develop/extras/gyminfo.html">detailed gym info.</a>
+                        If you have detailed gym info collection running, this gym's Pokemon information may be out of date.
+                    </p>
+                </center>
+            `
         }
-        // Update countdown time to prevent a countdown time of 0.
-        updateLabelDiffTime()
-    } else {
-        $('#sidebar-ongoing-raid-container').hide()
-        $('#sidebar-upcoming-raid-container').hide()
+
+        var topPart = gymLabel(gym)
+        sidebar.innerHTML = `${topPart}${pokemonHtml}`
+
+        sidebarClose = document.createElement('a')
+        sidebarClose.href = '#'
+        sidebarClose.className = 'close'
+        sidebarClose.tabIndex = 0
+        sidebar.appendChild(sidebarClose)
+
+        sidebarClose.addEventListener('click', function (event) {
+            event.preventDefault()
+            event.stopPropagation()
+            sidebar.classList.remove('visible')
+        })
+    })
+}
+
+function getSidebarGymMember(pokemon) {
+    const motivationZone = ['Good', 'Average', 'Bad']
+    const motivationPercentage = (pokemon.cp_now / pokemon.cp) * 100
+    var colorIdx = 0
+    if (motivationPercentage <= 46.66) {
+        colorIdx = 2
+    } else if ((motivationPercentage > 46.66) && (motivationPercentage < 73.33)) {
+        colorIdx = 1
     }
+
+    // Skip getDateStr() so we can re-use the moment.js object.
+    var relativeTime = 'Unknown'
+    var absoluteTime = ''
+
+    if (pokemon.deployed) {
+        let deploymentTime = moment(pokemon.deployed)
+        relativeTime = deploymentTime.fromNow()
+        // Append as string so we show nothing when the time is Unknown.
+        absoluteTime = '<div class="gym pokemon">(' + deploymentTime.format('MMM Do HH:mm') + ')</div>'
+    }
+
+    return `
+                    <tr onclick=toggleGymPokemonDetails(this)>
+                        <td width="30px">
+                            <img class="gym pokemon sprite" src="${getPokemonRawIconUrl(pokemon, serverSettings.generateImages)}">
+                        </td>
+                        <td>
+                            <div class="gym pokemon"><span class="gym pokemon name">${getPokemonNameWithForm(pokemon.pokemon_id, pokemon.form)}</span></div>
+                            <div>
+                                CP: ${pokemon.cp_now}
+                            </div>
+                            <div>
+                                Trainer: ${pokemon.trainer}
+                            </div>
+
+                        </td>
+                        <td width="190" align="center">
+                            <div class="gym pokemon">Deployed ${relativeTime}</div>
+                            ${absoluteTime}
+                        </td>
+                        <td width="10">
+                            <!--<a href="#" onclick="toggleGymPokemonDetails(this)">-->
+                                <i class="fa fa-angle-double-down"></i>
+                            <!--</a>-->
+                        </td>
+                    </tr>
+                    <tr class="details">
+                        <td colspan="2">
+                            <div class="iv">
+                                ATK: ${pokemon.iv_attack}
+                            </div>
+                            <div class="iv">
+                                DEF: ${pokemon.iv_defense}
+                            </div>
+                            <div class="iv">
+                                STA: ${pokemon.iv_stamina}
+                            </div>
+                            <div class="iv">
+                                Times Fed: ${pokemon.times_fed}
+                            </div>
+                            <div class="iv">
+                                Nickname: ${pokemon.nickname}
+                            </div>
+                            <div class="iv">
+                                Move 1: ${ getMoveName(pokemon.move_1)}
+                            </div>
+                            <div class="iv">
+                                Move 2: ${ getMoveName(pokemon.move_2)}
+                            </div>
+                            <div class="iv">
+                                Purified: ${pokemon.is_purified}
+                            </div>
+                            <div class="iv">
+                                Lucky: ${pokemon.is_lucky}
+                            </div>
+                            <div class="iv">
+                                Origin: ${pokemon.origin}
+                            </div>
+                            <div class="iv">
+                                Event: ${pokemon.origin_event}
+                            </div>
+                            <div class="iv">
+                                Traded: ${pokemon.origin_traded_from}
+                            </div> 
+                        </td>
+                        <td colspan="2">
+                            
+                            <div class="iv">
+                                Total Won: ${pokemon.battles_attacked}
+                            </div>
+                            <div class="iv">
+                                Total Defended: ${pokemon.battles_defended}
+                            </div>
+                            <div class="iv">
+                                PvP Won: ${pokemon.pvp_won}
+                            </div>
+                            <div class="iv">
+                                PvP Total: ${pokemon.pvp_total}
+                            </div>
+                            <div class="iv">
+                                NPC Won: ${pokemon.npc_won}
+                            </div>
+                            <div class="iv">
+                                NPC Total: ${pokemon.npc_total}
+                            </div>
+                            <div class="iv">
+                                Battles Won: ${pokemon.battles_won}
+                            </div>
+                            <div class="iv">
+                                Battles Lost: ${pokemon.battles_lost}
+                            </div>
+                            
+
+                        </td>
+                    </tr>
+                    `
+}
+
+function toggleGymPokemonDetails(e) { // eslint-disable-line no-unused-vars
+    e.lastElementChild.firstElementChild.classList.toggle('fa-angle-double-up')
+    e.lastElementChild.firstElementChild.classList.toggle('fa-angle-double-down')
+    e.nextElementSibling.classList.toggle('visible')
 }
 
 function gymLabel(gym) {
