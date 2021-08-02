@@ -381,47 +381,51 @@ class Gym(db.Model):
         return gyms
 
     @staticmethod
-    def get_gym(id):
+    def get_gym(gymid):
 
         result = []
 
-        pokemon = (GymMember
-                   .select(GymPokemon.cp.alias('pokemon_cp'),
-                           GymMember.cp_decayed,
-                           GymMember.deployment_time,
-                           GymMember.last_scanned,
-                           GymPokemon.pokemon_id,
-                           GymPokemon.pokemon_uid,
-                           GymPokemon.move_1,
-                           GymPokemon.move_2,
-                           GymPokemon.iv_attack,
-                           GymPokemon.iv_defense,
-                           GymPokemon.iv_stamina,
-                           GymPokemon.costume,
-                           GymPokemon.form,
-                           GymPokemon.shiny)
-                   .join(Gym, on=(GymMember.gym_id == Gym.gym_id))
-                   .join(GymPokemon,
-                         on=(GymMember.pokemon_uid == GymPokemon.pokemon_uid))
-                   .where(GymMember.gym_id == id)
-                   .where(GymMember.last_scanned > Gym.last_modified)
-                   .order_by(GymMember.deployment_time.desc())
-                   .distinct()
-                   .dicts())
+        # I was too lost to use the models here with this complex query so please someone help...
+        querryresult = db.engine.execute(
+            "select * from cev_gympokemon gp left join cev_trainer_pokemon tp on tp.uuid = gp.pokemon_uuid where (gp.gym_id, gp.last_seen) in (select gp2.gym_id, max(gp2.last_seen) from cev_gympokemon gp2 group by gp2.gym_id) and gp.gym_id = '"+gymid+"'")
 
-        for p in pokemon:
-            p['pokemon_name'] = get_pokemon_name(p['pokemon_id'])
-
-            p['move_1_name'] = get_move_name(p['move_1'])
-            p['move_1_damage'] = get_move_damage(p['move_1'])
-            p['move_1_energy'] = get_move_energy(p['move_1'])
-            p['move_1_type'] = get_move_type(p['move_1'])
-
-            p['move_2_name'] = get_move_name(p['move_2'])
-            p['move_2_damage'] = get_move_damage(p['move_2'])
-            p['move_2_energy'] = get_move_energy(p['move_2'])
-            p['move_2_type'] = get_move_type(p['move_2'])
-
+        for row in querryresult:
+            p = {}
+            p["trainer"] = row[0]
+            p["deployed"] = row[3]
+            p["cp_now"] = row[4]
+            p["motivation"] = row[5]
+            p["battles_won"] = row[6]
+            p["battles_lost"] = row[7]
+            p["times_fed"] = row[8]
+            p["pokemon_id"] = row[12]
+            p["nickname"] = row[13]
+            p["cp"] = row[14]
+            p["move_1"] = row[16]
+            p["move_2"] = row[17]
+            p["iv_attack"] = row[23]
+            p["iv_defense"] = row[24]
+            p["iv_stamina"] = row[25]
+            p["gender"] = row[26]
+            p["form"] = row[27]
+            p["costume"] = row[28]
+            p["is_shiny"] = row[30]
+            p["is_lucky"] = row[31]
+            p["is_purified"] = row[32]
+            p["creation_time"] = row[33]
+            p["origin"] = row[34]
+            p["origin_event"] = row[35]
+            p["origin_traded_from"] = row[36]
+            p["origin_invasion"] = row[37]
+            p["origin_egg"] = row[38]
+            p["battles_attacked"] = row[39]
+            p["battles_defended"] = row[40]
+            p["buddy_candy"] = row[41]
+            p["buddy_km"] = row[42]
+            p["pvp_won"] = row[43]
+            p["pvp_total"] = row[44]
+            p["npc_won"] = row[45]
+            p["npc_total"] = row[46]
             result.append(p)
 
         return result
@@ -447,7 +451,7 @@ class GymDetails(db.Model):
     )
 
 
-class Gymmember(db.Model):
+"""class GymMember(db.Model):
     __tablename__ = 'cev_gymmember'
 
     gym_id = db.Column(
@@ -474,7 +478,7 @@ class Gymmember(db.Model):
     )
 
 
-class Gympokemon(db.Model):
+class GymPokemon(db.Model):
     __tablename__ = 'cev_gympokemon'
 
     trainer = db.Column(
@@ -497,7 +501,7 @@ class Gympokemon(db.Model):
     last_seen = db.Column(db.DateTime)
 
 
-class Trainerpokemon(db.Model):
+class TrainerPokemon(db.Model):
     __tablename__ = 'cev_trainer_pokemon'
 
     uuid = db.Column(
@@ -553,7 +557,7 @@ class Trainerpokemon(db.Model):
     npc_won = db.Column(db.BigInteger, length=20)
     npc_total = db.Column(db.BigInteger, length=20)
     pokeball = db.Column(db.SmallInteger, length=6)
-    last_seen = db.Column(db.DateTime)
+    last_seen = db.Column(db.DateTime)"""
 
 
 class Raid(db.Model):

@@ -993,7 +993,7 @@ def create_app():
 
     @app.route('/get-gym')
     @auth_required
-    def get_gymdata(self):
+    def get_gym_data(*_args, **kwargs):
         gym_id = request.args.get('id')
         gym = Gym.get_gym(gym_id)
 
