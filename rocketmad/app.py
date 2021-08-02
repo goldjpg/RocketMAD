@@ -991,6 +991,14 @@ def create_app():
 
         return jsonify(d)
 
+    @app.route('/get-gym')
+    @auth_required
+    def get_gymdata(self):
+        gym_id = request.args.get('id')
+        gym = Gym.get_gym(gym_id)
+
+        return jsonify(gym)
+
     @app.route('/raw-data/users')
     def users_data():
         if not args.client_auth:

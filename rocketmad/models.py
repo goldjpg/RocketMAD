@@ -84,7 +84,7 @@ class Pokemon(db.Model):
             )
             query = (
                 db.session.query(*columns)
-                .outerjoin(
+                    .outerjoin(
                     TrsSpawn, Pokemon.spawnpoint_id == TrsSpawn.spawnpoint
                 )
             )
@@ -143,7 +143,7 @@ class Pokemon(db.Model):
                 Pokemon.pokemon_id,
                 func.count(Pokemon.pokemon_id).label('count')
             )
-            .group_by(Pokemon.pokemon_id)
+                .group_by(Pokemon.pokemon_id)
         )
         # Allow 0 to query everything.
         if hours > 0:
@@ -168,7 +168,7 @@ class Pokemon(db.Model):
                 func.count(Pokemon.pokemon_id).label('count'),
                 func.max(Pokemon.disappear_time).label('disappear_time')
             )
-            .group_by(Pokemon.pokemon_id, Pokemon.form)
+                .group_by(Pokemon.pokemon_id, Pokemon.form)
         )
 
         if timediff > 0:
@@ -208,8 +208,8 @@ class Pokemon(db.Model):
                 Pokemon.form, Pokemon.spawnpoint_id,
                 func.count(Pokemon.pokemon_id).label('count')
             )
-            .filter(Pokemon.pokemon_id == pokemon_id)
-            .group_by(
+                .filter(Pokemon.pokemon_id == pokemon_id)
+                .group_by(
                 Pokemon.latitude, Pokemon.longitude, Pokemon.pokemon_id,
                 Pokemon.form, Pokemon.spawnpoint_id
             )
@@ -247,11 +247,11 @@ class Pokemon(db.Model):
         '''
         query = (
             db.session.query(Pokemon.disappear_time)
-            .filter(
+                .filter(
                 Pokemon.pokemon_id == pokemon_id,
                 Pokemon.spawnpoint_id == spawnpoint_id
             )
-            .order_by(Pokemon.disappear_time)
+                .order_by(Pokemon.disappear_time)
         )
 
         if form_id is not None:
@@ -315,7 +315,7 @@ class Gym(db.Model):
         if raids:
             query = (
                 db.session.query(Gym, Raid)
-                .outerjoin(
+                    .outerjoin(
                     Raid,
                     and_(
                         Gym.gym_id == Raid.gym_id,
@@ -380,6 +380,52 @@ class Gym(db.Model):
 
         return gyms
 
+    @staticmethod
+    def get_gym(id):
+
+        result = []
+
+        pokemon = (GymMember
+                   .select(GymPokemon.cp.alias('pokemon_cp'),
+                           GymMember.cp_decayed,
+                           GymMember.deployment_time,
+                           GymMember.last_scanned,
+                           GymPokemon.pokemon_id,
+                           GymPokemon.pokemon_uid,
+                           GymPokemon.move_1,
+                           GymPokemon.move_2,
+                           GymPokemon.iv_attack,
+                           GymPokemon.iv_defense,
+                           GymPokemon.iv_stamina,
+                           GymPokemon.costume,
+                           GymPokemon.form,
+                           GymPokemon.shiny)
+                   .join(Gym, on=(GymMember.gym_id == Gym.gym_id))
+                   .join(GymPokemon,
+                         on=(GymMember.pokemon_uid == GymPokemon.pokemon_uid))
+                   .where(GymMember.gym_id == id)
+                   .where(GymMember.last_scanned > Gym.last_modified)
+                   .order_by(GymMember.deployment_time.desc())
+                   .distinct()
+                   .dicts())
+
+        for p in pokemon:
+            p['pokemon_name'] = get_pokemon_name(p['pokemon_id'])
+
+            p['move_1_name'] = get_move_name(p['move_1'])
+            p['move_1_damage'] = get_move_damage(p['move_1'])
+            p['move_1_energy'] = get_move_energy(p['move_1'])
+            p['move_1_type'] = get_move_type(p['move_1'])
+
+            p['move_2_name'] = get_move_name(p['move_2'])
+            p['move_2_damage'] = get_move_damage(p['move_2'])
+            p['move_2_energy'] = get_move_energy(p['move_2'])
+            p['move_2_type'] = get_move_type(p['move_2'])
+
+            result.append(p)
+
+        return result
+
 
 class GymDetails(db.Model):
     __tablename__ = 'gymdetails'
@@ -399,6 +445,115 @@ class GymDetails(db.Model):
     last_scanned = db.Column(
         db.DateTime, default=datetime.utcnow(), nullable=False
     )
+
+
+class Gymmember(db.Model):
+    __tablename__ = 'cev_gymmember'
+
+    gym_id = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci'),
+        primary_key=True
+    )
+    slot_1 = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci')
+    )
+    slot_2 = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci')
+    )
+    slot_3 = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci')
+    )
+    slot_4 = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci')
+    )
+    slot_5 = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci')
+    )
+    slot_6 = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci')
+    )
+
+
+class Gympokemon(db.Model):
+    __tablename__ = 'cev_gympokemon'
+
+    trainer = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci'),
+        primary_key=True
+    )
+    pokemon_uuid = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci'),
+        primary_key=True
+    )
+    gym_id = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci')
+    )
+    deployed = db.Column(db.DateTime)
+    cp_now = db.Column(db.SmallInteger, length=6)
+    motivation = db.Column(db.Float)
+    battles_won = db.Column(db.Integer, length=11)
+    battles_lost = db.Column(db.Integer, length=11)
+    times_fed = db.Column(db.Integer, length=11)
+    last_seen = db.Column(db.DateTime)
+
+
+class Trainerpokemon(db.Model):
+    __tablename__ = 'cev_trainer_pokemon'
+
+    uuid = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci'),
+        primary_key=True
+    )
+    trainer = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci'),
+        primary_key=True
+    )
+    pokemon_id = db.Column(db.SmallInteger, length=6)
+    nickname = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci')
+    )
+    cp = db.Column(db.SmallInteger, length=6)
+    hp = db.Column(db.SmallInteger, length=6)
+    move_1 = db.Column(db.SmallInteger, length=6)
+    move_2 = db.Column(db.SmallInteger, length=6)
+    move_3 = db.Column(db.SmallInteger, length=6)
+    weight = db.Column(db.Float)
+    height = db.Column(db.Float)
+    cp_multiplier = db.Column(db.Float)
+    upgrades = db.Column(db.SmallInteger, length=6)
+    iv_attack = db.Column(db.SmallInteger, length=6)
+    iv_defense = db.Column(db.SmallInteger, length=6)
+    iv_stamina = db.Column(db.SmallInteger, length=6)
+    gender = db.Column(db.SmallInteger, length=6)
+    form = db.Column(db.SmallInteger, length=6)
+    costume = db.Column(db.SmallInteger, length=6)
+    is_favorite = db.Column(db.TinyInteger, length=1)
+    is_shiny = db.Column(db.TinyInteger, length=1)
+    is_lucky = db.Column(db.TinyInteger, length=1)
+    is_purified = db.Column(db.TinyInteger, length=1)
+    creation_time = db.Column(db.DateTime)
+    origin = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci')
+    )
+    origin_event = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci')
+    )
+    origin_traded = db.Column(
+        db.String(length=50, collation='utf8mb4_unicode_ci')
+    )
+    origin_invasion = db.Column(db.SmallInteger, length=1)
+    origin_egg = db.Column(db.Integer, length=11)
+    battles_attacked = db.Column(db.BigInteger, length=20)
+    battles_defended = db.Column(db.BigInteger, length=20)
+    battles_defended = db.Column(db.BigInteger, length=20)
+    buddy_candy = db.Column(db.BigInteger, length=20)
+    buddy_km = db.Column(db.Float)
+    pvp_won = db.Column(db.BigInteger, length=20)
+    pvp_total = db.Column(db.BigInteger, length=20)
+    npc_won = db.Column(db.BigInteger, length=20)
+    npc_total = db.Column(db.BigInteger, length=20)
+    pokeball = db.Column(db.SmallInteger, length=6)
+    last_seen = db.Column(db.DateTime)
 
 
 class Raid(db.Model):
@@ -480,14 +635,14 @@ class Pokestop(db.Model):
             reset_timestamp = datetime.timestamp(reset_time)
             query = (
                 db.session.query(Pokestop, TrsQuest)
-                .outerjoin(
+                    .outerjoin(
                     TrsQuest,
                     and_(
                         Pokestop.pokestop_id == TrsQuest.GUID,
                         TrsQuest.quest_timestamp >= reset_timestamp
                     )
                 )
-                .options(
+                    .options(
                     Load(Pokestop).load_only(*columns),
                     Load(TrsQuest).load_only(*quest_columns)
                 )
@@ -560,12 +715,12 @@ class Pokestop(db.Model):
             else:
                 pokestop['quest'] = None
             if (pokestop['incident_expiration'] is not None
-                    and (pokestop['incident_expiration'] < now
-                         or not invasions)):
+                and (pokestop['incident_expiration'] < now
+                     or not invasions)):
                 pokestop['incident_grunt_type'] = None
                 pokestop['incident_expiration'] = None
             if (pokestop['lure_expiration'] is not None
-                    and (pokestop['lure_expiration'] < now or not lures)):
+                and (pokestop['lure_expiration'] < now or not lures)):
                 pokestop['active_fort_modifier'] = None
                 pokestop['lure_expiration'] = None
             pokestops.append(pokestop)
@@ -1106,8 +1261,8 @@ def db_clean_gyms(age_hours):
     # Remove old GymDetails entries.
     rows = (
         GymDetails.query
-        .filter(GymDetails.last_scanned < gym_info_timeout)
-        .delete()
+            .filter(GymDetails.last_scanned < gym_info_timeout)
+            .delete()
     )
     db.session.commit()
     log.debug('Deleted %d old GymDetails entries.', rows)
