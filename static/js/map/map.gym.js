@@ -512,8 +512,8 @@ function gymLabel(gym) {
     }
 
     let pokemonDisplay = ''
+    const panelid = gym.gym_id.replace(".", "");
     if(serverSettings.gymsMember && gym.slots_available < 6){
-        const panelid = gym.gym_id.replace(".", "");
 
         if (settings.showGymPokemon) {
              pokemonDisplay = `<div class='section-divider'></div><div class="invasion-pokemon-toggle" onclick="toggleGymMarkerPokemonData(true,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i></div><div class="gym-pokemon-container" id="marker-gymmember-data-container${panelid}">`
