@@ -994,6 +994,23 @@ def create_app():
     @app.route('/get-gym')
     @auth_required
     def get_gym_data(*_args, **kwargs):
+        if not kwargs['has_permission']:
+            abort(401)
+
+        user_args = get_args(kwargs['access_config'])
+
+        # Make sure fingerprint isn't blacklisted.
+        fingerprint_blacklisted = any([
+            fingerprints['no_referrer'](request)
+        ])
+
+        if fingerprint_blacklisted:
+            log.debug('User denied access: blacklisted fingerprint.')
+            abort(403)
+
+        if not user_args.no_gym_member:
+            abort(401)
+
         gym_id = request.args.get('id')
         gym = Gym.get_gym(gym_id)
 

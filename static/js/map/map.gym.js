@@ -285,17 +285,25 @@ function updateGymSidebar(id) {
         dataType: 'json',
         cache: false
     })
-
+    $('#sidebar-gymmember-loading-spinner').show()
+    for(var i=5; i>= 0;i--){
+        $('#sidebar-gymmember-container'+(i)).hide()
+    }
     data.done(function (result) {
         if (result.length) {
             result.forEach((pokemon, index) => {
                 updatesidebargymmember(pokemon,index)
             })
         }
+        for(var i=6; i> result.length;i--){
+            $('#sidebar-gymmember-container'+(i-1)).hide()
+        }
+        $('#sidebar-gymmember-loading-spinner').hide()
     })
 }
 
 function updatesidebargymmember(pokemon, count) {
+    $('#sidebar-gymmember-container'+count).show()
     var name = getPokemonName(pokemon.pokemon_id)
     if(pokemon.nickname != null){
         name += " (" + pokemon.nickname + ")"
@@ -337,21 +345,19 @@ function updatesidebargymmember(pokemon, count) {
     $('#sidebar-gymmember-pvp-total'+count).html(`${pokemon.pvp_total}`)
     $('#sidebar-gymmember-npc-won'+count).html(`${pokemon.npc_won}`)
     $('#sidebar-gymmember-npc-total'+count).html(`${pokemon.npc_total}`)
-    toggleGymPokemonData(index,true)
+    toggleGymPokemonData(count,true)
 }
 
 function toggleGymPokemonData(index,hide) { // eslint-disable-line no-unused-vars   
-    console.log("toggle data")
     if(hide){
         $('#sidebar-gymmember-data-container'+index).hide()
-        $('#sidebar-gymmember-data-toggle'+index).html(`${i18n('Show Pokémon')} <i class="fas fa-chevron-up"></i>`)
+        $('#sidebar-gymmember-data-toggle'+index).html(`${i18n('Show Pokémon Details')} <i class="fas fa-chevron-down"></i>`)
         $('#sidebar-gymmember-data-toggle'+index).attr('onclick', 'toggleGymPokemonData('+index+',false)')
     }else{
         $('#sidebar-gymmember-data-container'+index).show()
-        $('#sidebar-gymmember-data-toggle'+index).html(`${i18n('Hide Pokémon')} <i class="fas fa-chevron-down"></i>`)
+        $('#sidebar-gymmember-data-toggle'+index).html(`${i18n('Hide Pokémon Details')} <i class="fas fa-chevron-up"></i>`)
         $('#sidebar-gymmember-data-toggle'+index).attr('onclick', 'toggleGymPokemonData('+index+',true)') 
     }
-    
 }
 
 function gymLabel(gym) {
