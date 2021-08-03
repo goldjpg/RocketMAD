@@ -275,31 +275,36 @@ function updateGymSidebar(id) {
         $('#sidebar-ongoing-raid-container').hide()
         $('#sidebar-upcoming-raid-container').hide()
     }
-
-    var data = $.ajax({
-        url: 'get-gym',
-        type: 'GET',
-        data: {
-            'id': id
-        },
-        dataType: 'json',
-        cache: false
-    })
-    $('#sidebar-gymmember-loading-spinner').show()
-    for(var i=5; i>= 0;i--){
-        $('#sidebar-gymmember-container'+(i)).hide()
+    if(serverSettings.gymsMember){
+        $('#sidebar-gymmember-loading-spinner').show()
+        for(var i=5; i>= 0;i--){
+            $('#sidebar-gymmember-container'+(i)).hide()
+        }
+        var data = $.ajax({
+            url: 'get-gym',
+            type: 'GET',
+            data: {
+                'id': id
+            },
+            dataType: 'json',
+            cache: false
+        })
+        data.done(function (result) {
+            if (result.length) {
+                result.forEach((pokemon, index) => {
+                    updatesidebargymmember(pokemon,index)
+                })
+            }
+            for(var i=6; i> result.length;i--){
+                $('#sidebar-gymmember-container'+(i-1)).hide()
+            }
+            $('#sidebar-gymmember-loading-spinner').hide()
+        })
+    }else{
+        for(var i=5; i>= 0;i--){
+            $('#sidebar-gymmember-container'+(i)).hide()
+        }
     }
-    data.done(function (result) {
-        if (result.length) {
-            result.forEach((pokemon, index) => {
-                updatesidebargymmember(pokemon,index)
-            })
-        }
-        for(var i=6; i> result.length;i--){
-            $('#sidebar-gymmember-container'+(i-1)).hide()
-        }
-        $('#sidebar-gymmember-loading-spinner').hide()
-    })
 }
 
 function updatesidebargymmember(pokemon, count) {

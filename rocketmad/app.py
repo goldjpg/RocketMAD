@@ -229,6 +229,7 @@ def create_app():
                            and not user_args.no_gym_sidebar),
             'gymFilters': (not user_args.no_gyms
                            and not user_args.no_gym_filters),
+            'gymsMember': not user_args.no_gym_member,
             'raids': not user_args.no_raids,
             'raidFilters': (not user_args.no_raids
                             and not user_args.no_raid_filters),
@@ -1008,7 +1009,7 @@ def create_app():
             log.debug('User denied access: blacklisted fingerprint.')
             abort(403)
 
-        if not user_args.no_gym_member:
+        if user_args.no_gym_member:
             abort(401)
 
         gym_id = request.args.get('id')
