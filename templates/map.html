@@ -1705,7 +1705,227 @@
 
     {% if settings.gyms or settings.raids %}
     <ul id="gym-sidebar" class="sidenav">
-      <center><h1>Loading...</h1></center>
+      <i class="material-icons sidenav-close">close</i>
+      <div class="center-align">
+        <h5 id="sidebar-gym-title"></h5>
+        <div class="gym-sidebar-subheader-container">
+          <div class="team"></div>
+        </div>
+        <div class="gym-sidebar-image-container">
+          <img id="sidebar-gym-image" class="gym-image" width=162 height=162>
+        </div>
+        <div class="gym-sidebar-info-container">
+          <div class="gym-sidebar-info-container-left">
+            <div>
+              {{ i18n('Free slots') }}:
+            </div>
+            <div id="sidebar-gym-leader-container">
+              {{ i18n('Gym leader') }}:
+            </div>
+            <div>
+              {{ i18n('Last scanned') }}:
+            </div>
+            <div>
+              {{ i18n('Last modified') }}:
+            </div>
+          </div>
+          <div class="gym-sidebar-info-container-right">
+            <div>
+              <strong><span id="sidebar-gym-free-slots"></span></strong>
+            </div>
+            <div id="sidebar-gym-leader-container">
+              <strong><span id="sidebar-gym-leader"></span></strong>
+            </div>
+            <div>
+              <strong><span id="sidebar-gym-last-scanned"></span></strong>
+            </div>
+            <div>
+              <strong><span id="sidebar-gym-last-modified"></span></strong>
+            </div>
+          </div>
+        </div>
+        <div id="sidebar-gym-coordinates-container"></div>
+        {% if settings.raids %}
+        <div id="sidebar-ongoing-raid-container">
+          <div class="divider"></div>
+          <h5 id="sidebar-ongoing-raid-title"></h5>
+          <div class="gym-sidebar-subheader-container">
+            <div id="sidebar-ongoing-raid-level-container"></div>
+            <div id="sidebar-ongoing-raid-end-container"></div>
+          </div>
+          <div class="gym-sidebar-image-container">
+            <div>
+              <img id="sidebar-raid-pokemon-image" width=128>
+            </div>
+            <div id="sidebar-raid-types-container"></div>
+          </div>
+          <div class="gym-sidebar-info-container">
+            <div class="gym-sidebar-info-container-left">
+              <div>
+                {{ i18n('CP') }}:
+              </div>
+              <div>
+                {{ i18n('Fast move') }}:
+              </div>
+              <div>
+                {{ i18n('Charge move') }}:
+              </div>
+            </div>
+            <div class="gym-sidebar-info-container-right">
+              <div>
+                <strong><span id="sidebar-raid-cp"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-raid-fast-move"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-raid-charge-move"></span></strong>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="sidebar-upcoming-raid-container">
+          <div class="divider"></div>
+          <h5 id="sidebar-upcoming-raid-title"></h5>
+          <div class="gym-sidebar-subheader-container">
+            <div id="sidebar-upcoming-raid-start-container"></div>
+            <div id="sidebar-upcoming-raid-end-container"></div>
+          </div>
+          <img id="sidebar-raid-egg-image" width=96>
+        </div>
+        {% endif %}
+        <div id="sidebar-gymmember-container0">
+          <div class="divider"></div>
+          <h5 id="sidebar-gymmember-title0"></h5>
+          <div class="gym-sidebar-subheader-container">
+            <div id="sidebar-gymmember-trainername-container0"></div>
+            <div id="sidebar-gymmember-wpinfo-container0"></div>
+          </div>
+          <div class="gym-sidebar-image-container">
+            <div>
+              <img id="sidebar-gymmember-pokemon-image0" width=128>
+            </div>
+            <div id="sidebar-gymmember-types-container"></div>
+          </div>
+          <div class="invasion-pokemon-toggle" id="sidebar-gymmember-data-toggle0">
+            
+          </div>
+          <div class="gym-sidebar-info-container" id="sidebar-gymmember-data-container0">
+            <div class="gym-sidebar-info-container-left">       
+              <div>
+                {{ i18n('Fast move') }}:
+              </div>
+              <div>
+                {{ i18n('Charge move') }}:
+              </div>
+              <div>
+                {{ i18n('Deployed') }}:
+              </div>
+              <div>
+                {{ i18n('Battles won') }}:
+              </div>
+              <div>
+                {{ i18n('Battles lost') }}:
+              </div>
+              <div>
+                {{ i18n('Times fed') }}:
+              </div>
+              <div>
+                {{ i18n('IV') }}:
+              </div>                  
+              <div>
+                {{ i18n('Is lucky') }}:
+              </div>
+              <div>
+                {{ i18n('Is purified') }}:
+              </div>
+              <div>
+                {{ i18n('Origin') }}:
+              </div>
+              <div>
+                {{ i18n('Origin event') }}:
+              </div>
+              <div>
+                {{ i18n('Origin traded from') }}:
+              </div>
+              <div>
+                {{ i18n('Total battles attacked') }}:
+              </div>
+              <div>
+                {{ i18n('Total battles defended') }}:
+              </div>
+              <div>
+                {{ i18n('Total pvp won') }}:
+              </div>
+              <div>
+                {{ i18n('Total pvp battles') }}:
+              </div>
+              <div>
+                {{ i18n('Total npc won') }}:
+              </div>
+              <div>
+                {{ i18n('Total npc battles') }}:
+              </div>
+            </div>
+            <div class="gym-sidebar-info-container-right">              
+              <div>
+                <strong><span id="sidebar-gymmember-fast-move0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-charge-move0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-deployed0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-battles-won0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-battles-lost0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-times-fed0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-iv0"></span></strong>
+              </div>              
+              <div>
+                <strong><span id="sidebar-gymmember-is-lucky0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-is-purified0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-origin0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-origin-event0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-traded-from0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-battles-attacked0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-battles-defended0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-pvp-won0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-pvp-total0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-npc-won0"></span></strong>
+              </div>
+              <div>
+                <strong><span id="sidebar-gymmember-npc-total0"></span></strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </ul>
     {% endif %}
 
