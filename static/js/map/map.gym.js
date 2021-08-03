@@ -275,7 +275,7 @@ function updateGymSidebar(id) {
         $('#sidebar-ongoing-raid-container').hide()
         $('#sidebar-upcoming-raid-container').hide()
     }
-    if(serverSettings.gymsMember){
+    if(serverSettings.gymsMember && gym.slots_available < 6){
         $('#sidebar-gymmember-loading-spinner').show()
         for(var i=5; i>= 0;i--){
             $('#sidebar-gymmember-container'+(i)).hide()
