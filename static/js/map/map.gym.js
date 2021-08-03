@@ -304,6 +304,7 @@ function updateGymSidebar(id) {
         for(var i=5; i>= 0;i--){
             $('#sidebar-gymmember-container'+(i)).hide()
         }
+        $('#sidebar-gymmember-loading-spinner').hide()
     }
 }
 
