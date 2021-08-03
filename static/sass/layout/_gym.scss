@@ -43,6 +43,15 @@
   }
 }
 
+.leaflet-popup-content #member-container {
+  display: flex;
+
+  #member-container-left {
+    margin: auto 19px auto 0;
+    text-align: center;
+  }
+}
+
 .gym-image {
   border-style: solid;
   cursor: zoom-in;

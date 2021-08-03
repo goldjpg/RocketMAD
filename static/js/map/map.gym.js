@@ -512,28 +512,30 @@ function gymLabel(gym) {
     }
 
     let pokemonDisplay = ''
-    const panelid = gym.gym_id.replace(".", "");
+    if(serverSettings.gymsMember && gym.slots_available < 6){
+        const panelid = gym.gym_id.replace(".", "");
 
-    if (settings.showGymPokemon) {
-         pokemonDisplay = `<div class='section-divider'></div><div class="invasion-pokemon-toggle" onclick="toggleGymMarkerPokemonData(true,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i></div><div class="gym-pokemon-container" id="marker-gymmember-data-container${panelid}">`
-         pokemonDisplay += `<div class="preloader-wrapper big active" id="gym-marker-loading-spinner${panelid}">
-         <div class="spinner-layer">
-           <div class="circle-clipper left">
-             <div class="circle"></div>
-           </div>
-           <div class="gap-patch">
-               <div class="circle"></div>
-           </div>
-           <div class="circle-clipper right">
-             <div class="circle"></div>
-           </div>
-         </div>
-       </div>`
-       loadGymMemberForMarker(gym.gym_id,true)
-    } else {
-        pokemonDisplay = `<div class='section-divider'></div><div class="invasion-pokemon-toggle" onclick="toggleGymMarkerPokemonData(false,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Show Pokémon')} <i class="fas fa-chevron-down"></i></div><div class="gym-pokemon-container" style="display:none" id="marker-gymmember-data-container${panelid}">`
+        if (settings.showGymPokemon) {
+             pokemonDisplay = `<div class='section-divider'></div><div class="invasion-pokemon-toggle" onclick="toggleGymMarkerPokemonData(true,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i></div><div class="gym-pokemon-container" id="marker-gymmember-data-container${panelid}">`
+             pokemonDisplay += `<div class="preloader-wrapper big active" id="gym-marker-loading-spinner${panelid}">
+             <div class="spinner-layer">
+               <div class="circle-clipper left">
+                 <div class="circle"></div>
+               </div>
+               <div class="gap-patch">
+                   <div class="circle"></div>
+               </div>
+               <div class="circle-clipper right">
+                 <div class="circle"></div>
+               </div>
+             </div>
+           </div>`
+           loadGymMemberForMarker(gym.gym_id,true)
+        } else {
+            pokemonDisplay = `<div class='section-divider'></div><div class="invasion-pokemon-toggle" onclick="toggleGymMarkerPokemonData(false,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Show Pokémon')} <i class="fas fa-chevron-down"></i></div><div class="gym-pokemon-container" style="display:none" id="marker-gymmember-data-container${panelid}">`
+        }
+        pokemonDisplay += '</div>'
     }
-    pokemonDisplay += '</div>'
 
     return `
         <div id='gymlabel${panelid}'>
@@ -604,13 +606,13 @@ function loadGymMemberForMarker(gymid,hasloading) { // eslint-disable-line no-un
         if (result.length) {
             result.forEach((pokemon) => {
                 defenderhtml += `
-                <div id="raid-container">
-                  <div id='raid-container-left'>
+                <div id="member-container">
+                  <div id='member-container-left'>
                     <div>
                         <img src='${getPokemonRawIconUrl(pokemon, serverSettings.generateImages)}' width='32'>
                     </div>
                   </div>
-                  <div id='raid-container-right'>                   
+                  <div id='member-container-right'>                   
                     <div class='info-container'>
                       <div>
                         ${i18n('CP')}: <strong>${pokemon.cp_now}</strong>
