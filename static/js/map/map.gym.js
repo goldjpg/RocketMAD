@@ -511,8 +511,34 @@ function gymLabel(gym) {
         }
     }
 
+    let pokemonDisplay = ''
+    if(serverSettings.gymsMember && gym.slots_available < 6){
+        const panelid = gym.gym_id.replace(".", "");
+
+        if (settings.showGymPokemon) {
+             pokemonDisplay = `<div class='section-divider'></div><div class="invasion-pokemon-toggle" onclick="toggleGymMarkerPokemonData(true,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i></div><div class="gym-pokemon-container" id="marker-gymmember-data-container${panelid}">`
+             pokemonDisplay += `<div class="preloader-wrapper big active" id="gym-marker-loading-spinner${panelid}">
+             <div class="spinner-layer">
+               <div class="circle-clipper left">
+                 <div class="circle"></div>
+               </div>
+               <div class="gap-patch">
+                   <div class="circle"></div>
+               </div>
+               <div class="circle-clipper right">
+                 <div class="circle"></div>
+               </div>
+             </div>
+           </div>`
+           loadGymMemberForMarker(gym.gym_id,true)
+        } else {
+            pokemonDisplay = `<div class='section-divider'></div><div class="invasion-pokemon-toggle" onclick="toggleGymMarkerPokemonData(false,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Show Pokémon')} <i class="fas fa-chevron-down"></i></div><div class="gym-pokemon-container" style="display:none" id="marker-gymmember-data-container${panelid}">`
+        }
+        pokemonDisplay += '</div>'
+    }
+
     return `
-        <div>
+        <div id='gymlabel${panelid}'>
           <div id='gym-container'>
             <div id='gym-container-left'>
               ${gymImageDisplay}
@@ -543,10 +569,92 @@ function gymLabel(gym) {
             </div>
           </div>
           ${raidDisplay}
+          ${pokemonDisplay}
         </div>`
 }
 
-function updateGymLabel(gym, marker) {
+function loadGymMemberForMarker(gymid,hasloading) { // eslint-disable-line no-unused-vars   
+    const labelid = gymid.replace(".","")
+    if(!hasloading){
+        var defenderhtml = `<div class="preloader-wrapper big active" id="gym-marker-loading-spinner${labelid}">
+        <div class="spinner-layer">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div>
+          <div class="gap-patch">
+              <div class="circle"></div>
+          </div>
+          <div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>`
+      $('#marker-gymmember-data-container'+labelid).html(defenderhtml)
+    }
+    
+    var data = $.ajax({
+        url: 'get-gym',
+        type: 'GET',
+        data: {
+            'id': gymid
+        },
+        dataType: 'json',
+        cache: false
+    })
+    data.done(function (result) {
+        defenderhtml = ""
+        if (result.length) {
+            result.forEach((pokemon) => {
+                defenderhtml += `
+                <div id="member-container">
+                  <div id='member-container-left'>
+                    <div>
+                        <img src='${getPokemonRawIconUrl(pokemon, serverSettings.generateImages)}' width='32'>
+                    </div>
+                  </div>
+                  <div id='member-container-right'>                   
+                    <div class='info-container'>
+                      <div>
+                        ${i18n('CP')}: <strong>${pokemon.cp_now}</strong>
+                      </div>
+                      <div>
+                        ${i18n('Trainer')}: <strong>${pokemon.trainer}</strong>
+                      </div>
+                      <div>
+                        ${i18n('Deployed')}: <strong>${timestampToDateTime(pokemon.deployed)}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>`
+            })
+        }
+        if(result.length == 0){
+            $('#marker-gymmember-data-container'+labelid).html(i18n('No data'))
+        }else{
+            $('#marker-gymmember-data-container'+labelid).html(defenderhtml)
+        }
+        $(`#gym-marker-loading-spinner${labelid}`).hide()
+        mapData.gyms[gymid].marker.getPopup().setContent($(`gymlabel${labelid}`).html())
+    })
+}
+
+function toggleGymMarkerPokemonData(hide, gymid) { // eslint-disable-line no-unused-vars   
+    const labelid = gymid.replace(".","")
+    if(hide){
+        settings.showGymPokemon = false
+        $('#marker-gymmember-data-container'+labelid).hide()
+        $('#marker-gymmember-data-toggle'+labelid).html(`${i18n('Show Pokémon')} <i class="fas fa-chevron-down"></i>`)
+        $('#marker-gymmember-data-toggle'+labelid).attr('onclick', `toggleGymMarkerPokemonData(false,'${gymid}')`)
+    }else{
+        settings.showGymPokemon = true
+        $('#marker-gymmember-data-container'+labelid).show()
+        $('#marker-gymmember-data-toggle'+labelid).html(`${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i>`)
+        $('#marker-gymmember-data-toggle'+labelid).attr('onclick', `toggleGymMarkerPokemonData(true,'${gymid}')`) 
+        loadGymMemberForMarker(gymid,false)
+    }
+}
+
+function updateGymLabel(gym,marker) {
     marker.getPopup().setContent(gymLabel(gym))
     if (marker.isPopupOpen() && isValidRaid(gym.raid)) {
         // Update countdown time to prevent a countdown time of 0.

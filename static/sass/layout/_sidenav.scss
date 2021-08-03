@@ -145,6 +145,7 @@
   .gym-sidebar-info-container {
     display: flex;
     justify-content: center;
+    overflow: hidden;
 
     .gym-sidebar-info-container-left {
       margin-right: 4px;
