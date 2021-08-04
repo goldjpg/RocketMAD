@@ -341,13 +341,17 @@ function updatesidebargymmember(pokemon, count) {
     $('#sidebar-gymmember-battles-won'+count).html(`${pokemon.battles_won}`)
     $('#sidebar-gymmember-battles-lost'+count).html(`${pokemon.battles_lost}`)
     $('#sidebar-gymmember-times-fed'+count).html(`${pokemon.times_fed}`)
-    $('#sidebar-gymmember-iv'+count).html(`${pokemon.iv_attack}/${pokemon.iv_defense}/${pokemon.iv_stamina}`)
-    $('#sidebar-gymmember-is-lucky'+count).html(`${pokemon.lucky}`)
-    $('#sidebar-gymmember-is-purified'+count).html(`${pokemon.purified}`)
-    $('#sidebar-gymmember-origin'+count).html(`${pokemon.origin}`)
-    $('#sidebar-gymmember-origin-event'+count).html(`${pokemon.origin_event}`)
+    if(pokemon.iv_attack != null && pokemon.iv_defense != null && pokemon.iv_stamina != null){
+        $('#sidebar-gymmember-iv'+count).html(`${pokemon.iv_attack}/${pokemon.iv_defense}/${pokemon.iv_stamina}`)
+    }else{
+        $('#sidebar-gymmember-iv'+count).html(`&nbsp;`)
+    }
+    $('#sidebar-gymmember-is-lucky'+count).html(`${getReadableData(pokemon.lucky)}`)
+    $('#sidebar-gymmember-is-purified'+count).html(`${getReadableData(pokemon.purified)}`)
+    $('#sidebar-gymmember-origin'+count).html(`${getReadableData(pokemon.origin)}`)
+    $('#sidebar-gymmember-origin-event'+count).html(`${getReadableData(pokemon.origin_event)}`)
     if(serverSettings.gymsTrainer){
-        $('#sidebar-gymmember-traded-from'+count).html(`${pokemon.origin_traded_from}`)
+        $('#sidebar-gymmember-traded-from'+count).html(`${getReadableData(pokemon.origin_traded_from)}`)
     }
     $('#sidebar-gymmember-battles-attacked'+count).html(`${pokemon.battles_attacked}`)
     $('#sidebar-gymmember-battles-defended'+count).html(`${pokemon.battles_defended}`)
@@ -356,6 +360,32 @@ function updatesidebargymmember(pokemon, count) {
     $('#sidebar-gymmember-npc-won'+count).html(`${pokemon.npc_won}`)
     $('#sidebar-gymmember-npc-total'+count).html(`${pokemon.npc_total}`)
     toggleGymPokemonData(count,true)
+}
+
+function getReadableData(input){
+    if(input == 1){
+        return i18n("Yes")
+    }else if(input == 0){
+        return i18n("No")
+    }else if(input == null){
+        return "&nbsp;"
+    }else if(input == "egg_detail"){
+        return i18n("Egg")
+    }else if(input == "invasion_detail"){
+        return i18n("Rocket grunt")
+    }else if(input == "wild_detail"){
+        return i18n("Wild encounter")
+    }else if(input == "quest_detail"){
+        return i18n("Quest encounter")
+    }else if(input == "raid_detail"){
+        return i18n("Raid encounter")
+    }else if(input == "vs_seeker_detail"){
+        return i18n("PVP encounter")
+    }else if(input == "photobomb_detail"){
+        return i18n("Photobomb")
+    }else{
+        return i18n(input)
+    }
 }
 
 function toggleGymPokemonData(index,hide) { // eslint-disable-line no-unused-vars   
