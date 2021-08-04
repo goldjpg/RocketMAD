@@ -304,6 +304,9 @@ function updateGymSidebar(id) {
             }
             $('#sidebar-gymmember-loading-spinner').hide()
         })
+        data.fail(function (result) {         
+            $('#sidebar-gymmember-loading-spinner').hide()
+        })
     }else{
         for(var i=5; i>= 0;i--){
             $('#sidebar-gymmember-container'+(i)).hide()
@@ -676,6 +679,11 @@ function loadGymMemberForMarker(gymid,hasloading) { // eslint-disable-line no-un
         }else{
             $('#marker-gymmember-data-container'+labelid).html(defenderhtml)
         }
+        $(`#gym-marker-loading-spinner${labelid}`).hide()
+        mapData.gyms[gymid].marker.getPopup().setContent($(`gymlabel${labelid}`).html())
+    })
+    data.fail(function (result) {         
+        $('#marker-gymmember-data-container'+labelid).html(i18n('Error'))
         $(`#gym-marker-loading-spinner${labelid}`).hide()
         mapData.gyms[gymid].marker.getPopup().setContent($(`gymlabel${labelid}`).html())
     })
