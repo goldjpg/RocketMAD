@@ -277,6 +277,7 @@ function updateGymSidebar(id) {
     }
     if(serverSettings.gymsMember && gym.slots_available < 6){
         $('#sidebar-gymmember-loading-spinner').show()
+        $('#sidebar-gymmember-bottom-divider').show()    
         for(var i=5; i>= 0;i--){
             $('#sidebar-gymmember-container'+(i)).hide()
         }
@@ -298,12 +299,16 @@ function updateGymSidebar(id) {
             for(var i=6; i> result.length;i--){
                 $('#sidebar-gymmember-container'+(i-1)).hide()
             }
+            if(result.length == 0){
+                $('#sidebar-gymmember-bottom-divider').hide()    
+            }
             $('#sidebar-gymmember-loading-spinner').hide()
         })
     }else{
         for(var i=5; i>= 0;i--){
             $('#sidebar-gymmember-container'+(i)).hide()
         }
+        $('#sidebar-gymmember-bottom-divider').hide()    
         $('#sidebar-gymmember-loading-spinner').hide()
     }
 }
@@ -320,7 +325,9 @@ function updatesidebargymmember(pokemon, count) {
     const chargeMoveType = getMoveTypeNoI8ln(pokemon.move_2)
 
     $('#sidebar-gymmember-title'+count).html(`${name}`)
-    $('#sidebar-gymmember-trainername-container'+count).html(`${i18n('Trainer')} ${pokemon.trainer}`)
+    if(serverSettings.gymsTrainer){
+        $('#sidebar-gymmember-trainername-container'+count).html(`${i18n('Trainer')} ${pokemon.trainer}`)
+    }
     $('#sidebar-gymmember-wpinfo-container'+count).html(`${i18n('CP')} ${pokemon.cp_now}`)
     $('#sidebar-gymmember-pokemon-image'+count).attr('src', getPokemonRawIconUrl(pokemon, serverSettings.generateImages))
     let typesDisplay = ''
@@ -339,12 +346,18 @@ function updatesidebargymmember(pokemon, count) {
     $('#sidebar-gymmember-battles-won'+count).html(`${pokemon.battles_won}`)
     $('#sidebar-gymmember-battles-lost'+count).html(`${pokemon.battles_lost}`)
     $('#sidebar-gymmember-times-fed'+count).html(`${pokemon.times_fed}`)
-    $('#sidebar-gymmember-iv'+count).html(`${pokemon.iv_attack}/${pokemon.iv_defense}/${pokemon.iv_stamina}`)
-    $('#sidebar-gymmember-is-lucky'+count).html(`${pokemon.lucky}`)
-    $('#sidebar-gymmember-is-purified'+count).html(`${pokemon.purified}`)
-    $('#sidebar-gymmember-origin'+count).html(`${pokemon.origin}`)
-    $('#sidebar-gymmember-origin-event'+count).html(`${pokemon.origin_event}`)
-    $('#sidebar-gymmember-traded-from'+count).html(`${pokemon.origin_traded_from}`)
+    if(pokemon.iv_attack != null && pokemon.iv_defense != null && pokemon.iv_stamina != null){
+        $('#sidebar-gymmember-iv'+count).html(`${pokemon.iv_attack}/${pokemon.iv_defense}/${pokemon.iv_stamina}`)
+    }else{
+        $('#sidebar-gymmember-iv'+count).html(`&nbsp;`)
+    }
+    $('#sidebar-gymmember-is-lucky'+count).html(`${getReadableData(pokemon.lucky)}`)
+    $('#sidebar-gymmember-is-purified'+count).html(`${getReadableData(pokemon.purified)}`)
+    $('#sidebar-gymmember-origin'+count).html(`${getReadableData(pokemon.origin)}`)
+    $('#sidebar-gymmember-origin-event'+count).html(`${getReadableData(pokemon.origin_event)}`)
+    if(serverSettings.gymsTrainer){
+        $('#sidebar-gymmember-traded-from'+count).html(`${getReadableData(pokemon.origin_traded_from)}`)
+    }
     $('#sidebar-gymmember-battles-attacked'+count).html(`${pokemon.battles_attacked}`)
     $('#sidebar-gymmember-battles-defended'+count).html(`${pokemon.battles_defended}`)
     $('#sidebar-gymmember-pvp-won'+count).html(`${pokemon.pvp_won}`)
@@ -352,6 +365,32 @@ function updatesidebargymmember(pokemon, count) {
     $('#sidebar-gymmember-npc-won'+count).html(`${pokemon.npc_won}`)
     $('#sidebar-gymmember-npc-total'+count).html(`${pokemon.npc_total}`)
     toggleGymPokemonData(count,true)
+}
+
+function getReadableData(input){
+    if(input == 1){
+        return i18n("Yes")
+    }else if(input == 0){
+        return i18n("No")
+    }else if(input == null){
+        return "&nbsp;"
+    }else if(input == "egg_detail"){
+        return i18n("Egg")
+    }else if(input == "invasion_detail"){
+        return i18n("Rocket grunt")
+    }else if(input == "wild_detail"){
+        return i18n("Wild encounter")
+    }else if(input == "quest_detail"){
+        return i18n("Quest reward")
+    }else if(input == "raid_detail"){
+        return i18n("Raid encounter")
+    }else if(input == "vs_seeker_detail"){
+        return i18n("PVP reward")
+    }else if(input == "photobomb_detail"){
+        return i18n("Photobomb")
+    }else{
+        return i18n(input)
+    }
 }
 
 function toggleGymPokemonData(index,hide) { // eslint-disable-line no-unused-vars   
@@ -516,7 +555,7 @@ function gymLabel(gym) {
     if(serverSettings.gymsMember && gym.slots_available < 6){
 
         if (settings.showGymPokemon) {
-             pokemonDisplay = `<div class='section-divider'></div><div class="invasion-pokemon-toggle" onclick="toggleGymMarkerPokemonData(true,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i></div><div class="gym-pokemon-container" id="marker-gymmember-data-container${panelid}">`
+             pokemonDisplay = `<div class='section-divider'></div><div class="gymmember-pokemon-toggle" onclick="toggleGymMarkerPokemonData(true,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i></div><div class="gym-pokemon-container" id="marker-gymmember-data-container${panelid}">`
              pokemonDisplay += `<div class="preloader-wrapper big active" id="gym-marker-loading-spinner${panelid}">
              <div class="spinner-layer">
                <div class="circle-clipper left">
@@ -532,7 +571,7 @@ function gymLabel(gym) {
            </div>`
            loadGymMemberForMarker(gym.gym_id,true)
         } else {
-            pokemonDisplay = `<div class='section-divider'></div><div class="invasion-pokemon-toggle" onclick="toggleGymMarkerPokemonData(false,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Show Pokémon')} <i class="fas fa-chevron-down"></i></div><div class="gym-pokemon-container" style="display:none" id="marker-gymmember-data-container${panelid}">`
+            pokemonDisplay = `<div class='section-divider'></div><div class="gymmember-pokemon-toggle" onclick="toggleGymMarkerPokemonData(false,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Show Pokémon')} <i class="fas fa-chevron-down"></i></div><div class="gym-pokemon-container" style="display:none" id="marker-gymmember-data-container${panelid}">`
         }
         pokemonDisplay += '</div>'
     }
@@ -603,8 +642,14 @@ function loadGymMemberForMarker(gymid,hasloading) { // eslint-disable-line no-un
     })
     data.done(function (result) {
         defenderhtml = ""
+        var trainerhtml = ""
         if (result.length) {
             result.forEach((pokemon) => {
+                if(serverSettings.gymsTrainer){
+                    trainerhtml = `<div>
+                        	            ${i18n('Trainer')}: <strong>${pokemon.trainer}</strong>
+                                   </div>`
+                }
                 defenderhtml += `
                 <div id="member-container">
                   <div id='member-container-left'>
@@ -617,9 +662,7 @@ function loadGymMemberForMarker(gymid,hasloading) { // eslint-disable-line no-un
                       <div>
                         ${i18n('CP')}: <strong>${pokemon.cp_now}</strong>
                       </div>
-                      <div>
-                        ${i18n('Trainer')}: <strong>${pokemon.trainer}</strong>
-                      </div>
+                      ${trainerhtml}
                       <div>
                         ${i18n('Deployed')}: <strong>${timestampToDateTime(pokemon.deployed)}</strong>
                       </div>

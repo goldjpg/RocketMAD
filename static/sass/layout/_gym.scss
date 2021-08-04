@@ -77,6 +77,10 @@
   }
 }
 
+.gymmember-pokemon-toggle {
+  cursor: pointer;
+}
+
 .team {
   &.mystic {
     color: $mystic-blue;

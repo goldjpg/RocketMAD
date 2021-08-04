@@ -381,17 +381,20 @@ class Gym(db.Model):
         return gyms
 
     @staticmethod
-    def get_gym(gymid):
+    def get_gym(gymid, include_trainers=True):
 
         result = []
 
         # I was too lost to use the models here with this complex query so please someone help...
         querryresult = db.engine.execute(
-            "select * from cev_gympokemon gp left join cev_trainer_pokemon tp on tp.uuid = gp.pokemon_uuid where (gp.gym_id, gp.last_seen) in (select gp2.gym_id, max(gp2.last_seen) from cev_gympokemon gp2 group by gp2.gym_id) and gp.gym_id = '"+gymid+"'")
+            "select * from cev_gympokemon gp left join cev_trainer_pokemon tp on tp.uuid = gp.pokemon_uuid where (gp.gym_id, gp.last_seen) in (select gp2.gym_id, max(gp2.last_seen) from cev_gympokemon gp2 group by gp2.gym_id) and gp.gym_id = '"+gymid+"' order by gp.deployed desc")
 
         for row in querryresult:
             p = {}
-            p["trainer"] = row[0]
+            if include_trainers:
+                p["trainer"] = row[0]
+            else:
+                p["trainer"] = ""
             p["deployed"] = row[3]
             p["cp_now"] = row[4]
             p["motivation"] = row[5]
@@ -415,7 +418,10 @@ class Gym(db.Model):
             p["creation_time"] = row[33]
             p["origin"] = row[34]
             p["origin_event"] = row[35]
-            p["origin_traded_from"] = row[36]
+            if include_trainers:
+                p["origin_traded_from"] = row[36]
+            else:
+                p["origin_traded_from"] = ""
             p["origin_invasion"] = row[37]
             p["origin_egg"] = row[38]
             p["battles_attacked"] = row[39]

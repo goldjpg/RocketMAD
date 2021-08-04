@@ -1794,11 +1794,14 @@
           <img id="sidebar-raid-egg-image" width=96>
         </div>
         {% endif %}
+        {% if settings.gymsMember %}
         <div id="sidebar-gymmember-container0">
           <div class="divider"></div>
           <h5 id="sidebar-gymmember-title0"></h5>
           <div class="gym-sidebar-subheader-container">
+            {% if settings.gymsTrainer %}
             <div id="sidebar-gymmember-trainername-container0"></div>
+            {% endif %}
             <div id="sidebar-gymmember-wpinfo-container0"></div>
           </div>
           <div class="gym-sidebar-image-container">
@@ -1807,7 +1810,7 @@
             </div>
             <div id="sidebar-gymmember-types-container0"></div>
           </div>
-          <div class="invasion-pokemon-toggle" id="sidebar-gymmember-data-toggle0">
+          <div class="gymmember-pokemon-toggle" id="sidebar-gymmember-data-toggle0">
             
           </div>
           <div class="gym-sidebar-info-container" id="sidebar-gymmember-data-container0">
@@ -1845,9 +1848,11 @@
               <div>
                 {{ i18n('Origin event') }}:
               </div>
+              {% if settings.gymsTrainer %}
               <div>
                 {{ i18n('Origin traded from') }}:
               </div>
+              {% endif %}
               <div>
                 {{ i18n('Total battles attacked') }}:
               </div>
@@ -1901,9 +1906,11 @@
               <div>
                 <strong><span id="sidebar-gymmember-origin-event0"></span></strong>
               </div>
+              {% if settings.gymsTrainer %}
               <div>
                 <strong><span id="sidebar-gymmember-traded-from0"></span></strong>
               </div>
+              {% endif %}
               <div>
                 <strong><span id="sidebar-gymmember-battles-attacked0"></span></strong>
               </div>
@@ -1929,7 +1936,9 @@
           <div class="divider"></div>
           <h5 id="sidebar-gymmember-title1"></h5>
           <div class="gym-sidebar-subheader-container">
+            {% if settings.gymsTrainer %}
             <div id="sidebar-gymmember-trainername-container1"></div>
+            {% endif %}
             <div id="sidebar-gymmember-wpinfo-container1"></div>
           </div>
           <div class="gym-sidebar-image-container">
@@ -1938,7 +1947,7 @@
             </div>
             <div id="sidebar-gymmember-types-container1"></div>
           </div>
-          <div class="invasion-pokemon-toggle" id="sidebar-gymmember-data-toggle1">
+          <div class="gymmember-pokemon-toggle" id="sidebar-gymmember-data-toggle1">
             
           </div>
           <div class="gym-sidebar-info-container" id="sidebar-gymmember-data-container1">
@@ -1976,9 +1985,11 @@
               <div>
                 {{ i18n('Origin event') }}:
               </div>
+              {% if settings.gymsTrainer %}
               <div>
                 {{ i18n('Origin traded from') }}:
               </div>
+              {% endif %}
               <div>
                 {{ i18n('Total battles attacked') }}:
               </div>
@@ -2032,9 +2043,11 @@
               <div>
                 <strong><span id="sidebar-gymmember-origin-event1"></span></strong>
               </div>
+              {% if settings.gymsTrainer %}
               <div>
                 <strong><span id="sidebar-gymmember-traded-from1"></span></strong>
               </div>
+              {% endif %}
               <div>
                 <strong><span id="sidebar-gymmember-battles-attacked1"></span></strong>
               </div>
@@ -2060,7 +2073,9 @@
           <div class="divider"></div>
           <h5 id="sidebar-gymmember-title2"></h5>
           <div class="gym-sidebar-subheader-container">
+            {% if settings.gymsTrainer %}
             <div id="sidebar-gymmember-trainername-container2"></div>
+            {% endif %}
             <div id="sidebar-gymmember-wpinfo-container2"></div>
           </div>
           <div class="gym-sidebar-image-container">
@@ -2069,7 +2084,7 @@
             </div>
             <div id="sidebar-gymmember-types-container2"></div>
           </div>
-          <div class="invasion-pokemon-toggle" id="sidebar-gymmember-data-toggle2">
+          <div class="gymmember-pokemon-toggle" id="sidebar-gymmember-data-toggle2">
             
           </div>
           <div class="gym-sidebar-info-container" id="sidebar-gymmember-data-container2">
@@ -2107,9 +2122,11 @@
               <div>
                 {{ i18n('Origin event') }}:
               </div>
+              {% if settings.gymsTrainer %}
               <div>
                 {{ i18n('Origin traded from') }}:
               </div>
+              {% endif %}
               <div>
                 {{ i18n('Total battles attacked') }}:
               </div>
@@ -2163,9 +2180,11 @@
               <div>
                 <strong><span id="sidebar-gymmember-origin-event2"></span></strong>
               </div>
+              {% if settings.gymsTrainer %}
               <div>
                 <strong><span id="sidebar-gymmember-traded-from2"></span></strong>
               </div>
+              {% endif %}
               <div>
                 <strong><span id="sidebar-gymmember-battles-attacked2"></span></strong>
               </div>
@@ -2191,7 +2210,9 @@
           <div class="divider"></div>
           <h5 id="sidebar-gymmember-title3"></h5>
           <div class="gym-sidebar-subheader-container">
+            {% if settings.gymsTrainer %}
             <div id="sidebar-gymmember-trainername-container3"></div>
+            {% endif %}
             <div id="sidebar-gymmember-wpinfo-container3"></div>
           </div>
           <div class="gym-sidebar-image-container3">
@@ -2200,7 +2221,7 @@
             </div>
             <div id="sidebar-gymmember-types-container"></div>
           </div>
-          <div class="invasion-pokemon-toggle" id="sidebar-gymmember-data-toggle3">
+          <div class="gymmember-pokemon-toggle" id="sidebar-gymmember-data-toggle3">
             
           </div>
           <div class="gym-sidebar-info-container" id="sidebar-gymmember-data-container3">
@@ -2238,9 +2259,11 @@
               <div>
                 {{ i18n('Origin event') }}:
               </div>
+              {% if settings.gymsTrainer %}
               <div>
                 {{ i18n('Origin traded from') }}:
               </div>
+              {% endif %}
               <div>
                 {{ i18n('Total battles attacked') }}:
               </div>
@@ -2294,9 +2317,11 @@
               <div>
                 <strong><span id="sidebar-gymmember-origin-event3"></span></strong>
               </div>
+              {% if settings.gymsTrainer %}
               <div>
                 <strong><span id="sidebar-gymmember-traded-from3"></span></strong>
               </div>
+              {% endif %}
               <div>
                 <strong><span id="sidebar-gymmember-battles-attacked3"></span></strong>
               </div>
@@ -2322,7 +2347,9 @@
           <div class="divider"></div>
           <h5 id="sidebar-gymmember-title4"></h5>
           <div class="gym-sidebar-subheader-container">
+            {% if settings.gymsTrainer %}
             <div id="sidebar-gymmember-trainername-container4"></div>
+            {% endif %}
             <div id="sidebar-gymmember-wpinfo-container4"></div>
           </div>
           <div class="gym-sidebar-image-container">
@@ -2331,7 +2358,7 @@
             </div>
             <div id="sidebar-gymmember-types-container4"></div>
           </div>
-          <div class="invasion-pokemon-toggle" id="sidebar-gymmember-data-toggle4">
+          <div class="gymmember-pokemon-toggle" id="sidebar-gymmember-data-toggle4">
             
           </div>
           <div class="gym-sidebar-info-container" id="sidebar-gymmember-data-container4">
@@ -2369,9 +2396,11 @@
               <div>
                 {{ i18n('Origin event') }}:
               </div>
+              {% if settings.gymsTrainer %}
               <div>
                 {{ i18n('Origin traded from') }}:
               </div>
+              {% endif %}
               <div>
                 {{ i18n('Total battles attacked') }}:
               </div>
@@ -2425,9 +2454,11 @@
               <div>
                 <strong><span id="sidebar-gymmember-origin-event4"></span></strong>
               </div>
+              {% if settings.gymsTrainer %}
               <div>
                 <strong><span id="sidebar-gymmember-traded-from4"></span></strong>
               </div>
+              {% endif %}
               <div>
                 <strong><span id="sidebar-gymmember-battles-attacked4"></span></strong>
               </div>
@@ -2453,7 +2484,9 @@
           <div class="divider"></div>
           <h5 id="sidebar-gymmember-title5"></h5>
           <div class="gym-sidebar-subheader-container">
+            {% if settings.gymsTrainer %}
             <div id="sidebar-gymmember-trainername-container5"></div>
+            {% endif %}
             <div id="sidebar-gymmember-wpinfo-container5"></div>
           </div>
           <div class="gym-sidebar-image-container">
@@ -2462,7 +2495,7 @@
             </div>
             <div id="sidebar-gymmember-types-container5"></div>
           </div>
-          <div class="invasion-pokemon-toggle" id="sidebar-gymmember-data-toggle5">
+          <div class="gymmember-pokemon-toggle" id="sidebar-gymmember-data-toggle5">
             
           </div>
           <div class="gym-sidebar-info-container" id="sidebar-gymmember-data-container5">
@@ -2500,9 +2533,11 @@
               <div>
                 {{ i18n('Origin event') }}:
               </div>
+              {% if settings.gymsTrainer %}
               <div>
                 {{ i18n('Origin traded from') }}:
               </div>
+              {% endif %}
               <div>
                 {{ i18n('Total battles attacked') }}:
               </div>
@@ -2556,9 +2591,11 @@
               <div>
                 <strong><span id="sidebar-gymmember-origin-event5"></span></strong>
               </div>
+              {% if settings.gymsTrainer %}
               <div>
                 <strong><span id="sidebar-gymmember-traded-from5"></span></strong>
               </div>
+              {% endif %}
               <div>
                 <strong><span id="sidebar-gymmember-battles-attacked5"></span></strong>
               </div>
@@ -2580,7 +2617,8 @@
             </div>
           </div>
         </div>
-        <div class="preloader-wrapper big active centered" id="sidebar-gymmember-loading-spinner">
+        <div class="divider" id="sidebar-gymmember-bottom-divider"></div>
+        <div class="preloader-wrapper big active" id="sidebar-gymmember-loading-spinner">
           <div class="spinner-layer">
             <div class="circle-clipper left">
               <div class="circle"></div>
@@ -2593,6 +2631,7 @@
             </div>
           </div>
         </div>
+        {% endif %}
       </div>
     </ul>
     {% endif %}

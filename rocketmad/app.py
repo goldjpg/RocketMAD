@@ -104,8 +104,8 @@ def auth_required(f):
             a = auth_factory.get_authenticator(auth_type)
             has_permission, redirect_uri, access_config = a.get_access_data()
             if not has_permission or (
-                    access_config is not None
-                    and access_config not in valid_access_configs):
+                access_config is not None
+                and access_config not in valid_access_configs):
                 session.clear()
             kwargs['has_permission'] = has_permission
             kwargs['redirect_uri'] = redirect_uri
@@ -115,6 +115,7 @@ def auth_required(f):
             kwargs['redirect_uri'] = None
             kwargs['access_config'] = None
         return f(*_args, **kwargs)
+
     return decorated_function
 
 
@@ -230,6 +231,7 @@ def create_app():
             'gymFilters': (not user_args.no_gyms
                            and not user_args.no_gym_filters),
             'gymsMember': not user_args.no_gym_member,
+            'gymsTrainer': not user_args.no_gym_trainer,
             'raids': not user_args.no_raids,
             'raidFilters': (not user_args.no_raids
                             and not user_args.no_raid_filters),
@@ -339,7 +341,7 @@ def create_app():
         user_args = get_args(kwargs['access_config'])
 
         if (user_args.no_pokestops or user_args.no_quests
-                or user_args.no_quest_page):
+            or user_args.no_quest_page):
             if args.client_auth:
                 if is_logged_in():
                     abort(403)
@@ -408,14 +410,14 @@ def create_app():
         origin_point = LatLng.from_degrees(lat, lon)
 
         for pokemon in convert_pokemon_list(
-                Pokemon.get_active(None, None, None, None)):
+            Pokemon.get_active(None, None, None, None)):
             pokemon_point = LatLng.from_degrees(pokemon['latitude'],
                                                 pokemon['longitude'])
             diff = pokemon_point - origin_point
             diff_lat = diff.lat().degrees
             diff_lng = diff.lng().degrees
             direction = (('N' if diff_lat >= 0 else 'S')
-                         if abs(diff_lat) > 1e-4 else '') +\
+                         if abs(diff_lat) > 1e-4 else '') + \
                         (('E' if diff_lng >= 0 else 'W')
                          if abs(diff_lng) > 1e-4 else '')
             entry = {
@@ -608,8 +610,8 @@ def create_app():
             sessions = get_sessions(r)
             for s in sessions:
                 if ('auth_type' in s
-                        and s['auth_type'] == session['auth_type']
-                        and s['id'] == session['id']):
+                    and s['auth_type'] == session['auth_type']
+                    and s['id'] == session['id']):
                     r.delete('session:' + s['session_id'])
 
         return redirect(url_for('map_page'))
@@ -725,11 +727,11 @@ def create_app():
         d['oNeLng'] = neLng
 
         if (oSwLat is not None and oSwLng is not None
-                and oNeLat is not None and oNeLng is not None):
+            and oNeLat is not None and oNeLng is not None):
             # If old coords are not equal to current coords we have
             # moved/zoomed!
             if (oSwLng < swLng and oSwLat < swLat
-                    and oNeLat > neLat and oNeLng > neLng):
+                and oNeLat > neLat and oNeLng > neLng):
                 new_area = False  # We zoomed in no new area uncovered.
             elif not (oSwLat == swLat and oSwLng == swLng
                       and oNeLat == neLat and oNeLng == neLng):
@@ -797,7 +799,7 @@ def create_app():
             eids = None
             ids = None
             if (request.args.get('eids')
-                    and request.args.get('prionotif', 'false') == 'false'):
+                and request.args.get('prionotif', 'false') == 'false'):
                 request_eids = request.args.get('eids').split(',')
                 eids = [int(i) for i in request_eids]
             elif not request.args.get('eids') and request.args.get('ids'):
@@ -1012,10 +1014,12 @@ def create_app():
         if user_args.no_gym_member:
             abort(401)
 
-        gym_id = request.args.get('id')
-        gym = Gym.get_gym(gym_id)
+        include_trainers = not user_args.no_gym_trainer
 
-        return jsonify(gym)
+        gym_id = request.args.get('id')
+        gymdata = Gym.get_gym(gym_id, include_trainers)
+
+        return jsonify(gymdata)
 
     @app.route('/raw-data/users')
     def users_data():
