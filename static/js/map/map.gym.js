@@ -277,6 +277,7 @@ function updateGymSidebar(id) {
     }
     if(serverSettings.gymsMember && gym.slots_available < 6){
         $('#sidebar-gymmember-loading-spinner').show()
+        $('#sidebar-gymmember-bottom-divider').show()    
         for(var i=5; i>= 0;i--){
             $('#sidebar-gymmember-container'+(i)).hide()
         }
@@ -298,12 +299,16 @@ function updateGymSidebar(id) {
             for(var i=6; i> result.length;i--){
                 $('#sidebar-gymmember-container'+(i-1)).hide()
             }
+            if(result.length == 0){
+                $('#sidebar-gymmember-bottom-divider').hide()    
+            }
             $('#sidebar-gymmember-loading-spinner').hide()
         })
     }else{
         for(var i=5; i>= 0;i--){
             $('#sidebar-gymmember-container'+(i)).hide()
         }
+        $('#sidebar-gymmember-bottom-divider').hide()    
         $('#sidebar-gymmember-loading-spinner').hide()
     }
 }
@@ -376,11 +381,11 @@ function getReadableData(input){
     }else if(input == "wild_detail"){
         return i18n("Wild encounter")
     }else if(input == "quest_detail"){
-        return i18n("Quest encounter")
+        return i18n("Quest reward")
     }else if(input == "raid_detail"){
         return i18n("Raid encounter")
     }else if(input == "vs_seeker_detail"){
-        return i18n("PVP encounter")
+        return i18n("PVP reward")
     }else if(input == "photobomb_detail"){
         return i18n("Photobomb")
     }else{
@@ -550,7 +555,7 @@ function gymLabel(gym) {
     if(serverSettings.gymsMember && gym.slots_available < 6){
 
         if (settings.showGymPokemon) {
-             pokemonDisplay = `<div class='section-divider'></div><div class="invasion-pokemon-toggle" onclick="toggleGymMarkerPokemonData(true,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i></div><div class="gym-pokemon-container" id="marker-gymmember-data-container${panelid}">`
+             pokemonDisplay = `<div class='section-divider'></div><div class="gymmember-pokemon-toggle" onclick="toggleGymMarkerPokemonData(true,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i></div><div class="gym-pokemon-container" id="marker-gymmember-data-container${panelid}">`
              pokemonDisplay += `<div class="preloader-wrapper big active" id="gym-marker-loading-spinner${panelid}">
              <div class="spinner-layer">
                <div class="circle-clipper left">
@@ -566,7 +571,7 @@ function gymLabel(gym) {
            </div>`
            loadGymMemberForMarker(gym.gym_id,true)
         } else {
-            pokemonDisplay = `<div class='section-divider'></div><div class="invasion-pokemon-toggle" onclick="toggleGymMarkerPokemonData(false,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Show Pokémon')} <i class="fas fa-chevron-down"></i></div><div class="gym-pokemon-container" style="display:none" id="marker-gymmember-data-container${panelid}">`
+            pokemonDisplay = `<div class='section-divider'></div><div class="gymmember-pokemon-toggle" onclick="toggleGymMarkerPokemonData(false,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Show Pokémon')} <i class="fas fa-chevron-down"></i></div><div class="gym-pokemon-container" style="display:none" id="marker-gymmember-data-container${panelid}">`
         }
         pokemonDisplay += '</div>'
     }
