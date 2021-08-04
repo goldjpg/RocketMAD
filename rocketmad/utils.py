@@ -146,7 +146,10 @@ def get_args(access_config=None):
                         help=('Disables gym filters in side nav.'),
                         action='store_true', default=False)
     parser.add_argument('-ngm', '--no-gym-member',
-                        help=('# Disable gym members.'),
+                        help=('Disable gym members.'),
+                        action='store_true', default=False)
+    parser.add_argument('-ngt', '--no-gym-trainer',
+                        help=('Disable trainer names in gym member displays.'),
                         action='store_true', default=False)
     parser.add_argument('-nr', '--no-raids',
                         help=('Disables Raids.'),
@@ -639,6 +642,7 @@ def get_args(access_config=None):
             'no_gym_sidebar',
             'no_gym_filters',
             'no_gym_member',
+            'no_gym_trainer',
             'no_raids',
             'no_raid_filters',
             'black_white_badges',

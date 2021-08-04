@@ -320,7 +320,9 @@ function updatesidebargymmember(pokemon, count) {
     const chargeMoveType = getMoveTypeNoI8ln(pokemon.move_2)
 
     $('#sidebar-gymmember-title'+count).html(`${name}`)
-    $('#sidebar-gymmember-trainername-container'+count).html(`${i18n('Trainer')} ${pokemon.trainer}`)
+    if(serverSettings.gymsTrainer){
+        $('#sidebar-gymmember-trainername-container'+count).html(`${i18n('Trainer')} ${pokemon.trainer}`)
+    }
     $('#sidebar-gymmember-wpinfo-container'+count).html(`${i18n('CP')} ${pokemon.cp_now}`)
     $('#sidebar-gymmember-pokemon-image'+count).attr('src', getPokemonRawIconUrl(pokemon, serverSettings.generateImages))
     let typesDisplay = ''
@@ -344,7 +346,9 @@ function updatesidebargymmember(pokemon, count) {
     $('#sidebar-gymmember-is-purified'+count).html(`${pokemon.purified}`)
     $('#sidebar-gymmember-origin'+count).html(`${pokemon.origin}`)
     $('#sidebar-gymmember-origin-event'+count).html(`${pokemon.origin_event}`)
-    $('#sidebar-gymmember-traded-from'+count).html(`${pokemon.origin_traded_from}`)
+    if(serverSettings.gymsTrainer){
+        $('#sidebar-gymmember-traded-from'+count).html(`${pokemon.origin_traded_from}`)
+    }
     $('#sidebar-gymmember-battles-attacked'+count).html(`${pokemon.battles_attacked}`)
     $('#sidebar-gymmember-battles-defended'+count).html(`${pokemon.battles_defended}`)
     $('#sidebar-gymmember-pvp-won'+count).html(`${pokemon.pvp_won}`)
@@ -603,8 +607,14 @@ function loadGymMemberForMarker(gymid,hasloading) { // eslint-disable-line no-un
     })
     data.done(function (result) {
         defenderhtml = ""
+        var trainerhtml = ""
         if (result.length) {
             result.forEach((pokemon) => {
+                if(serverSettings.gymsTrainer){
+                    trainerhtml = `<div>
+                        	            ${i18n('Trainer')}: <strong>${pokemon.trainer}</strong>
+                                   </div>`
+                }
                 defenderhtml += `
                 <div id="member-container">
                   <div id='member-container-left'>
@@ -617,9 +627,7 @@ function loadGymMemberForMarker(gymid,hasloading) { // eslint-disable-line no-un
                       <div>
                         ${i18n('CP')}: <strong>${pokemon.cp_now}</strong>
                       </div>
-                      <div>
-                        ${i18n('Trainer')}: <strong>${pokemon.trainer}</strong>
-                      </div>
+                      ${trainerhtml}
                       <div>
                         ${i18n('Deployed')}: <strong>${timestampToDateTime(pokemon.deployed)}</strong>
                       </div>
