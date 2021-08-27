@@ -253,8 +253,8 @@ class ImageGenerator:
                                    if evolution > 0 else '')
             out_filename = (
                 path_generated_gym / "{}_L{}_R{}_P{}{}{}{}.png".format(
-                team, level, raid_level, pkm, form_extension,
-                costume_extension, evolution_extension))
+                    team, level, raid_level, pkm, form_extension,
+                    costume_extension, evolution_extension))
             im_lines.extend(self._draw_raid_pokemon(pkm, form, costume,
                                                     evolution))
             im_lines.extend(self._draw_raid_level(raid_level))
@@ -383,13 +383,7 @@ class ImageGenerator:
 
         filename = f'pm{pkm}{form_suffix}{costume_suffix}{gender_suffix}' \
                    f'{shiny_suffix}.icon.png'
-        file_path = self.pokemon_icon_path / 'Addressable Assets' / filename
-
-        if not file_path.exists() and gender != MALE:
-            return self._get_unity_pokemon_asset_path(
-                pkm, MALE, form, costume, evolution, shiny)
-
-        return file_path
+        return self.pokemon_icon_path / 'Addressable Assets' / filename
 
     def _get_old_pokemon_asset_path(self, pkm, gender=GENDER_UNSET, form=0,
                                     costume=0, evolution=EVOLUTION_UNSET,
@@ -431,12 +425,34 @@ class ImageGenerator:
         if should_use_asset_bundle_suffix:
             file_path = (
                 self.pokemon_icon_path / 'pokemon_icon{}{}.png'.format(
-                gender_form_asset_suffix, shiny_suffix))
+                    gender_form_asset_suffix, shiny_suffix))
         else:
             file_path = (
                 self.pokemon_icon_path / 'pokemon_icon_{:03d}{}{}{}.png'
                 .format(pkm, gender_form_asset_suffix,
                         costume_asset_suffix, shiny_suffix))
+
+        if not file_path.exists() and gender == FEMALE:
+            return self._get_old_pokemon_asset_path(
+                pkm, MALE, form, costume, evolution, shiny)
+
+        return file_path
+
+    def _pokemon_asset_path(self, pkm, classifier=None, gender=GENDER_UNSET,
+                            form=0, costume=0, evolution=EVOLUTION_UNSET,
+                            shiny=False, weather=None):
+        asset_path = self._get_unity_pokemon_asset_path(
+            pkm, gender, form, costume, evolution, shiny)
+        if not asset_path.exists():
+            asset_path = self._get_old_pokemon_asset_path(
+                pkm, gender, form, costume, evolution, shiny)
+
+        gender_suffix = '_g2' if gender == FEMALE else '_g1'
+        form_suffix = '_f' + str(form) if form > 0 else ''
+        costume_suffix = '_c' + str(costume) if costume > 0 else ''
+        evolution_suffix = '_e' + str(evolution) if evolution > 0 else ''
+        shiny_suffix = '_s' if shiny else ''
+        weather_suffix = '_' + weather_names[weather] if weather else ''
 
         if classifier:
             target_dir = path_generated / 'pokemon_{}'.format(classifier)
@@ -449,21 +465,14 @@ class ImageGenerator:
         if asset_path.exists():
             return asset_path, target_dir / target_filename
         else:
-            if gender == MALE:
-                log.warning("Cannot find PogoAssets file {}".format(
-                    assets_fullname))
-                dummy_icon = self.pokemon_icon_path / 'pokemon_icon_000.png'
-                target = Path(target_path) / 'pkm_000.png'
-                if dummy_icon.exists():
-                    return dummy_icon, target
-                else:
-                    return Path(path_images) / 'dummy_pokemon.png', target
-
-            return self._pokemon_asset_path(pkm, classifier=classifier,
-                                            gender=MALE, form=form,
-                                            costume=costume,
-                                            evolution=evolution, shiny=shiny,
-                                            weather=weather, )
+            log.warning("Cannot find PogoAssets file for target file {}"
+                        .format(target_filename))
+            dummy_icon = self.pokemon_icon_path / 'pokemon_icon_000.png'
+            target = Path(target_dir) / 'pm0.png'
+            if dummy_icon.exists():
+                return dummy_icon, target
+            else:
+                return Path(path_images) / 'dummy_pokemon.png', target
 
     def _draw_gym_subject(self, image, size, gravity='north', trim=False):
         trim_cmd = ' -fuzz 0.5% -trim +repage' if trim else ''
