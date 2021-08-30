@@ -635,7 +635,7 @@ class Pokestop(db.Model):
                 'GUID', 'quest_timestamp', 'quest_task', 'quest_type',
                 'quest_stardust', 'quest_pokemon_id', 'quest_pokemon_form_id',
                 'quest_pokemon_costume_id', 'quest_reward_type',
-                'quest_item_id', 'quest_item_amount'
+                'quest_item_id', 'quest_item_amount', 'with_ar'
             ]
             hours = int(args.quest_reset_time.split(':')[0])
             minutes = int(args.quest_reset_time.split(':')[1])
@@ -649,7 +649,8 @@ class Pokestop(db.Model):
                     TrsQuest,
                     and_(
                         Pokestop.pokestop_id == TrsQuest.GUID,
-                        TrsQuest.quest_timestamp >= reset_timestamp
+                        TrsQuest.quest_timestamp >= reset_timestamp,
+                        TrsQuest.with_ar == 1
                     )
                 )
                     .options(
@@ -768,6 +769,8 @@ class TrsQuest(db.Model):
     quest_pokemon_costume_id = db.Column(
         db.SmallInteger, default=0, nullable=False
     )
+    with_ar = db.Column(TINYINT, nullable=False)
+
 
     __table_args__ = (
         Index('quest_type', 'quest_type'),
