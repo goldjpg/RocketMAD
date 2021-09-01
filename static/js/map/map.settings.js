@@ -203,6 +203,12 @@ function initSettingsSidebar() {
             Store.set('filterPokemonById', this.checked)
         })
 
+        $('#exclude-nearby-cell-switch').on('change', function () {
+            settings.excludeNearbyCells = this.checked
+            updateMap({ loadAllPokemon: true })
+            //TODO: fix bug             updatePokemons()
+            Store.set('excludeNearbyCells', this.checked)
+        })
         $('#pokemon-icon-size-select').on('change', function () {
             const iconSize = Number(this.value)
             settings.pokemonIconSizeModifier = iconSize
@@ -1379,6 +1385,7 @@ function initSettingsSidebar() {
         $('#filter-pokemon-switch').prop('checked', settings.filterPokemonById)
         $('a[data-target="pokemon-filter-modal"]').toggle(settings.filterPokemonById)
         $('#pokemon-icon-size-select').val(settings.pokemonIconSizeModifier)
+        $('#exclude-nearby-cell-switch').prop('checked', settings.excludeNearbyCells)
     }
     if (serverSettings.pokemonValues) {
         $('#pokemon-values-switch').prop('checked', settings.showPokemonValues)

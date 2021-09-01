@@ -107,7 +107,7 @@ function updatePokestopMarker(pokestop, marker, isNotifPokestop) {
 
     const icon = L.contentIcon({
         iconUrl: getPokestopIconUrlFiltered(pokestop),
-        iconSize: [32 * upscaleModifier, 32 * upscaleModifier],
+        iconSize: [48 * upscaleModifier, 32 * upscaleModifier],
         iconAnchor: [16 * upscaleModifier, 32 * upscaleModifier],
         popupAnchor: [0, -16 * upscaleModifier]
     })

@@ -300,7 +300,7 @@ class ImageGenerator:
         if not self.generate_images or not reward1:
             return stop_image
         try:
-            im_lines = ['-gravity center -extent 96x64 ']
+            im_lines = ['-background none -gravity center -extent 96x64 ']
             out_filename = path_generated_stop / (stop_image.name.replace(".png", ""))
             if reward1:
                 im_lines.extend(self._quest_reward(reward1, item1, mon1, form1, costume1, True))
@@ -310,7 +310,8 @@ class ImageGenerator:
                 out_filename = Path(str(out_filename) + "_{}_{}_{}_{}_{}".format(reward2, item2, mon2, form2, costume2))
             out_filename = Path(str(out_filename) + ".png")
             return self._run_imagemagick(stop_image, im_lines, out_filename)
-        except TypeError:
+        except Exception as e:
+            log.warning("Can't generate stop image")
             return stop_image
 
     def _draw_raid_pokemon(self, pkm, form, costume, evolution):
@@ -359,7 +360,13 @@ class ImageGenerator:
             imgPath = self._pokemon_asset_path(
                 pokemon_id, form=form_id,
                 costume=costume_id)
-            imgSize = 50
+            if not Path(str(imgPath)).is_file():
+                imgPath = self._get_old_pokemon_asset_path(
+                    pokemon_id, form=form_id,
+                    costume=costume_id)
+            if not Path(str(imgPath)).is_file():
+                raise FileNotFoundError("No pokemon icon " + imgPath + " does not exist")
+            imgSize = 75
         elif reward_type == 12:
             imgPath = path_item / "7.png"
         if left:

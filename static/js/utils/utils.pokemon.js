@@ -165,6 +165,14 @@ function getPokemonRarity(pokemonId) {
     return 6 // New Spawn.
 }
 
+function getLocationNearStop() {
+    return '❗ ' + i18n('Location inaccurate') + '.<br>' + i18n('Pokemon close to stop')
+}
+
+function getLocationInCell() {
+    return '❗ ' + i18n('Location very inaccurate') + '.<br>' + i18n('Pokemon in L15 S2 cell')
+}
+
 function getPokemonRarityName(pokemonId) {
     return i18n(rarityNames[getPokemonRarity(pokemonId) - 1])
 }
@@ -233,8 +241,15 @@ function createPokemonMarker(pokemon, generateImages) {
         iconUrl: getPokemonMapIconUrl(pokemon, generateImages),
         iconSize: [32, 32]
     })
+    
+    let offsetLat = 0
+    let offsetLon = 0
+    if (pokemon.seen_type === 'nearby_stop' || pokemon.seen_type === 'nearby_cell') {
+        offsetLat = (Math.floor(Math.random() * 10) - 5) / 10000
+        offsetLon = (Math.floor(Math.random() * 10) - 5) / 10000
+    }
 
-    return L.marker([pokemon.latitude, pokemon.longitude], { icon: icon })
+    return L.marker([pokemon.latitude + offsetLat, pokemon.longitude + offsetLon], { icon: icon })
 }
 
 function searchPokemon(searchText) {

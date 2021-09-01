@@ -780,6 +780,7 @@ function loadRawData() {
     const loadSpawnpoints = settings.showSpawnpoints
     const loadScannedLocs = settings.showScannedLocations
     const loadNests = settings.showNests
+    const loadExcludeNearbyCells = settings.excludeNearbyCells
 
     const bounds = map.getBounds()
     const swPoint = bounds.getSouthWest()
@@ -823,7 +824,8 @@ function loadRawData() {
             allWeather: getAllWeather,
             allSpawnpoints: getAllSpawnpoints,
             allScannedLocs: getAllScannedLocs,
-            allNests: getAllNests
+            allNests: getAllNests,
+            excludeNearbyCells: loadExcludeNearbyCells
         },
         dataType: 'json',
         cache: false,
