@@ -9,30 +9,30 @@ filterManagers
 */
 /* exported processPokestop */
 
-function isPokestopMeetsQuestFilters(pokestop) {
-    if (!settings.showQuests || !pokestop.quest) {
+function isPokestopMeetsQuestFilters(quest) {
+    if (!settings.showQuests || !quest) {
         return false
     }
 
     if (settings.filterQuests) {
-        switch (pokestop.quest.reward_type) {
+        switch (quest.reward_type) {
             case 2: {
-                const id = pokestop.quest.item_id + '_' + pokestop.quest.item_amount
+                const id = quest.item_id + '_' + quest.item_amount
                 return !settings.excludedQuestItems.has(id)
             }
             case 3: {
-                const id = '6_' + pokestop.quest.stardust
+                const id = '6_' + quest.stardust
                 return !settings.excludedQuestItems.has(id)
             }
             case 4: {
-                const id = '8_' + pokestop.quest.item_amount
+                const id = '8_' + quest.item_amount
                 return !settings.excludedQuestItems.has(id)
 			}
             case 7: {
-                return !settings.excludedQuestPokemon.has(pokestop.quest.pokemon_id)
+                return !settings.excludedQuestPokemon.has(quest.pokemon_id)
             }
             case 12: {
-                const id = '7_' + pokestop.quest.item_amount
+                const id = '7_' + quest.item_amount
                 return !settings.excludedQuestItems.has(id)
             }
         }
@@ -73,8 +73,9 @@ function isPokestopMeetsFilters(pokestop) {
         }
     }
 
-    return settings.showPokestopsNoEvent || isPokestopMeetsQuestFilters(pokestop) ||
-        isPokestopMeetsInvasionFilters(pokestop) || isPokestopMeetsLureFilters(pokestop)
+    return settings.showPokestopsNoEvent || isPokestopMeetsQuestFilters(pokestop.quest) ||
+        isPokestopMeetsInvasionFilters(pokestop) || isPokestopMeetsLureFilters(pokestop) ||
+        isPokestopMeetsQuestFilters(pokestop.quest_ar)
 }
 
 function isPokestopRangesActive() {
@@ -105,7 +106,7 @@ function updatePokestopMarker(pokestop, marker, isNotifPokestop) {
     let shadowAnchor = null
     const upscaleModifier = isNotifPokestop && settings.upscaleNotifMarkers ? 1.3 : 1
 
-    if (isPokestopMeetsQuestFilters(pokestop)) {
+    if (isPokestopMeetsQuestFilters(pokestop.quest)) {
         const quest = pokestop.quest
         shadowAnchor = [30, 30]
         switch (quest.reward_type) {
@@ -174,6 +175,7 @@ function pokestopLabel(pokestop) {
     var lureClass = ''
     var invasionDisplay = ''
     var questDisplay = ''
+    var questarDisplay = ''
 
     if (pokestop.image != null && pokestop.image !== '') {
         imageUrl = pokestop.image.replace(/^http:\/\//i, '//')
@@ -183,88 +185,13 @@ function pokestopLabel(pokestop) {
         imageUrl = getPokestopIconUrlFiltered(pokestop)
         imageClass = 'pokestop-icon'
     }
-
-    if (isPokestopMeetsQuestFilters(pokestop)) {
-        const quest = pokestop.quest
-        let rewardImageUrl
-        let rewardText
-        let isNotifQuest
-        let notifFunction
-        let excludeFunction
-        let infoButtonDisplay = ''
-
-        switch (quest.reward_type) {
-            case 2:
-                rewardImageUrl = getItemImageUrl(quest.item_id)
-                rewardText = quest.item_amount + ' ' + getItemName(quest.item_id)
-                excludeFunction = `excludeQuestItem(${quest.item_id},${quest.item_amount})`
-                notifFunction = `toggleQuestItemNotif(${quest.item_id},${quest.item_amount})`
-                isNotifQuest = settings.notifQuestItems.has(quest.item_id + '_' + quest.item_amount)
-                break
-            case 3:
-                rewardImageUrl = getItemImageUrl(6)
-                rewardText = quest.stardust + ' ' + getItemName(6)
-                excludeFunction = `excludeQuestItem(6,${quest.stardust})`
-                notifFunction = `toggleQuestItemNotif(6,${quest.stardust})`
-                isNotifQuest = settings.notifQuestItems.has('6_' + quest.stardust)
-                break
-            case 4:
-                rewardImageUrl = getItemImageUrl(8)
-                rewardText = `${quest.item_amount} ${getPokemonName(quest.pokemon_id)} ${getItemName(8)}`
-                excludeFunction = `excludeQuestItem(8,${quest.item_amount})`
-                notifFunction = `toggleQuestItemNotif(8,${quest.item_amount})`
-                isNotifQuest = settings.notifQuestItems.has('8_' + quest.item_amount)
-                break
-            case 7:
-                rewardImageUrl = getPokemonRawIconUrl({ pokemon_id: quest.pokemon_id, form: quest.form_id, costume: quest.costume_id }, serverSettings.generateImages)
-                rewardText = `${getPokemonNameWithForm(quest.pokemon_id, quest.form_id)} #${quest.pokemon_id}`
-                excludeFunction = `excludeQuestPokemon(${quest.pokemon_id})`
-                notifFunction = `toggleQuestPokemonNotif(${quest.pokemon_id})`
-                infoButtonDisplay = `<a href='https://pokemongo.gamepress.gg/pokemon/${quest.pokemon_id}' class='link-button' target='_blank' title='${i18n('View on GamePress')}'><i class="fas fa-info-circle"></i></a>`
-                isNotifQuest = settings.notifQuestPokemon.has(quest.pokemon_id)
-                break
-            case 12:
-                rewardImageUrl = getItemImageUrl(7)
-                rewardText = `${quest.item_amount} ${getPokemonName(quest.pokemon_id)} ${getItemName(7)}`
-                excludeFunction = `excludeQuestItem(7,${quest.item_amount})`
-                notifFunction = `toggleQuestItemNotif(7,${quest.item_amount})`
-                isNotifQuest = settings.notifQuestItems.has('7_' + quest.item_amount)
-        }
-
-        const notifText = isNotifQuest ? i18n('Don\'t notify') : i18n('Notify')
-        const notifIconClass = isNotifQuest ? 'fas fa-bell-slash' : 'fas fa-bell'
-
-        questDisplay = `
-            <div class='section-divider'></div>
-            <div class='pokestop-container'>
-              <div class='pokestop-container-left'>
-                <div>
-                  <img class='quest-image' src="${rewardImageUrl}" width='64'/>
-                </div>
-              </div>
-              <div class='pokestop-container-right'>
-                <div class='title'>
-                  ${i18n('Quest')}
-                </div>
-                <div class='info-container'>
-                  <div>
-                    ${i18n('Task')}: <strong>${quest.task}</strong>
-                  </div>
-                  <div>
-                    ${i18n('Reward')}: <strong>${rewardText}</strong>
-                  </div>
-                  <div>
-                    ${i18n('Scanned')}: <strong>${timestampToDateTime(quest.scanned_at)}</strong>
-                  </div>
-                </div>
-                <div>
-                  <a href='javascript:${notifFunction}' class='link-button' title="${notifText}"><i class="${notifIconClass}"></i></a>
-                  <a href='javascript:${excludeFunction}' class='link-button' title=${i18n('Hide')}><i class="fas fa-eye-slash"></i></a>
-                  <a href='javascript:removePokestopMarker("${pokestop.pokestop_id}")' class='link-button' title=${i18n('Remove')}><i class="fas fa-trash"></i></a>
-                  ${infoButtonDisplay}
-                </div>
-              </div>
-            </div>`
+    const quest = pokestop.quest
+    if (isPokestopMeetsQuestFilters(quest)) {
+        questDisplay = getQuestLabel(pokestop, false)
+    }
+    const quest_ar = pokestop.quest_ar
+    if (isPokestopMeetsQuestFilters(quest_ar)) {
+        questarDisplay = getQuestLabel(pokestop, true)
     }
 
     if (isPokestopMeetsInvasionFilters(pokestop)) {
@@ -378,7 +305,91 @@ function pokestopLabel(pokestop) {
             </div>
           </div>
           ${questDisplay}
+          ${questarDisplay}
           ${invasionDisplay}
+        </div>`
+}
+
+function getQuestLabel(pokestop, is_ar){
+    const quest = is_ar ? pokestop.quest_ar : pokestop.quest
+    let rewardImageUrl
+    let rewardText
+    let isNotifQuest
+    let notifFunction
+    let excludeFunction
+    let infoButtonDisplay = ''
+
+    switch (quest.reward_type) {
+        case 2:
+            rewardImageUrl = getItemImageUrl(quest.item_id)
+            rewardText = quest.item_amount + ' ' + getItemName(quest.item_id)
+            excludeFunction = `excludeQuestItem(${quest.item_id},${quest.item_amount})`
+            notifFunction = `toggleQuestItemNotif(${quest.item_id},${quest.item_amount})`
+            isNotifQuest = settings.notifQuestItems.has(quest.item_id + '_' + quest.item_amount)
+            break
+        case 3:
+            rewardImageUrl = getItemImageUrl(6)
+            rewardText = quest.stardust + ' ' + getItemName(6)
+            excludeFunction = `excludeQuestItem(6,${quest.stardust})`
+            notifFunction = `toggleQuestItemNotif(6,${quest.stardust})`
+            isNotifQuest = settings.notifQuestItems.has('6_' + quest.stardust)
+            break
+        case 4:
+            rewardImageUrl = getItemImageUrl(8)
+            rewardText = `${quest.item_amount} ${getPokemonName(quest.pokemon_id)} ${getItemName(8)}`
+            excludeFunction = `excludeQuestItem(8,${quest.item_amount})`
+            notifFunction = `toggleQuestItemNotif(8,${quest.item_amount})`
+            isNotifQuest = settings.notifQuestItems.has('8_' + quest.item_amount)
+            break
+        case 7:
+            rewardImageUrl = getPokemonRawIconUrl({ pokemon_id: quest.pokemon_id, form: quest.form_id, costume: quest.costume_id }, serverSettings.generateImages)
+            rewardText = `${getPokemonNameWithForm(quest.pokemon_id, quest.form_id)} #${quest.pokemon_id}`
+            excludeFunction = `excludeQuestPokemon(${quest.pokemon_id})`
+            notifFunction = `toggleQuestPokemonNotif(${quest.pokemon_id})`
+            infoButtonDisplay = `<a href='https://pokemongo.gamepress.gg/pokemon/${quest.pokemon_id}' class='link-button' target='_blank' title='${i18n('View on GamePress')}'><i class="fas fa-info-circle"></i></a>`
+            isNotifQuest = settings.notifQuestPokemon.has(quest.pokemon_id)
+            break
+        case 12:
+            rewardImageUrl = getItemImageUrl(7)
+            rewardText = `${quest.item_amount} ${getPokemonName(quest.pokemon_id)} ${getItemName(7)}`
+            excludeFunction = `excludeQuestItem(7,${quest.item_amount})`
+            notifFunction = `toggleQuestItemNotif(7,${quest.item_amount})`
+            isNotifQuest = settings.notifQuestItems.has('7_' + quest.item_amount)
+    }
+
+    const notifText = isNotifQuest ? i18n('Don\'t notify') : i18n('Notify')
+    const notifIconClass = isNotifQuest ? 'fas fa-bell-slash' : 'fas fa-bell'
+    const titleText = is_ar ? i18n('Quest (AR)') : i18n('Quest')
+     return `
+        <div class='section-divider'></div>
+        <div class='pokestop-container'>
+          <div class='pokestop-container-left'>
+            <div>
+              <img class='quest-image' src="${rewardImageUrl}" width='64'/>
+            </div>
+          </div>
+          <div class='pokestop-container-right'>
+            <div class='title'>
+              ${titleText}
+            </div>
+            <div class='info-container'>
+              <div>
+                ${i18n('Task')}: <strong>${quest.task}</strong>
+              </div>
+              <div>
+                ${i18n('Reward')}: <strong>${rewardText}</strong>
+              </div>
+              <div>
+                ${i18n('Scanned')}: <strong>${timestampToDateTime(quest.scanned_at)}</strong>
+              </div>
+            </div>
+            <div>
+              <a href='javascript:${notifFunction}' class='link-button' title="${notifText}"><i class="${notifIconClass}"></i></a>
+              <a href='javascript:${excludeFunction}' class='link-button' title=${i18n('Hide')}><i class="fas fa-eye-slash"></i></a>
+              <a href='javascript:removePokestopMarker("${pokestop.pokestop_id}")' class='link-button' title=${i18n('Remove')}><i class="fas fa-trash"></i></a>
+              ${infoButtonDisplay}
+            </div>
+          </div>
         </div>`
 }
 
