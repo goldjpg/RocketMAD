@@ -558,7 +558,17 @@ function getPokestopIconUrlFiltered(pokestop) {
     var has_quest = 0
     var grunt = 0
     var lure = 0
-    if (isPokestopMeetsQuestFilters(pokestop)) {
+    var questquery = ""
+    var count = 1
+    const quests = [pokestop.quest, pokestop.quest_ar]
+    quests.forEach((quest)=>{
+        if (isPokestopMeetsQuestFilters(quest)) {
+            questquery += `&reward${count + "=" + quest.reward_type}&item${count + "=" + quest.item_id}&mon${count + "=" + quest.pokemon_id}&form${count + "=" + quest.form_id}&costume${count + "=" + quest.costume_id}`
+            count ++
+        }
+    })
+    
+    if(questquery != ""){
         has_quest = 1
     }
     if (isPokestopMeetsInvasionFilters(pokestop)) {
@@ -568,7 +578,7 @@ function getPokestopIconUrlFiltered(pokestop) {
         lure = pokestop.active_fort_modifier
     }
 
-    return `stop_img?has_quest=${has_quest}&grunt=${grunt}&lure=${lure}`
+    return `stop_img?has_quest=${has_quest}&grunt=${grunt}&lure=${lure + questquery}`
 }
 
 function getPokestopNotificationInfo(pokestop) {

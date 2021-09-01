@@ -767,10 +767,6 @@ class Pokestop(db.Model):
                 and (pokestop['lure_expiration'] < now or not lures)):
                 pokestop['active_fort_modifier'] = None
                 pokestop['lure_expiration'] = None
-            if quest_orm is not None:
-                print(str(pokestop))
-            if quest_orm2 is not None:
-                print(str(pokestop))
             pokestops.append(pokestop)
 
         return pokestops

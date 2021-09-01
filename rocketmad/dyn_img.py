@@ -294,20 +294,24 @@ class ImageGenerator:
         gym_image = path_gym / '{}.png'.format(team)
         return self._run_imagemagick(gym_image, im_lines, out_filename)
 
-    def get_stop_icon(self, has_quest, grunt, lure, reward1, item1, mon1, form1, costume1, reward2, item2, mon2, form2, costume2):
+    def get_stop_icon(self, has_quest, grunt, lure, reward1=0, item1=0, mon1=0, form1=0, costume1=0, reward2=0, item2=0,
+                      mon2=0, form2=0, costume2=0):
         stop_image = self._default_stop_image(has_quest, grunt, lure)
-        if not self.generate_images:
+        if not self.generate_images or not reward1:
             return stop_image
-        im_lines = []
-        out_filename = path_generated_stop / (stop_image.name.replace(".png", ""))
-        if reward1:
-            im_lines.extend(self._quest_reward(reward1, item1, mon1, form1, costume1, True))
-            out_filename += "_{}_{}_{}_{}_{}".format(reward1, item1, mon1, form1, costume1)
-        if reward2:
-            im_lines.extend(self._quest_reward(reward2, item2, mon2, form2, costume2, True))
-            out_filename += "_{}_{}_{}_{}_{}".format(reward2, item2, mon2, form2, costume2)
-        out_filename += ".png"
-        return self._run_imagemagick(stop_image, im_lines, out_filename)
+        try:
+            im_lines = ['-gravity center -extent 96x64 ']
+            out_filename = path_generated_stop / (stop_image.name.replace(".png", ""))
+            if reward1:
+                im_lines.extend(self._quest_reward(reward1, item1, mon1, form1, costume1, True))
+                out_filename = Path(str(out_filename) + "_{}_{}_{}_{}_{}".format(reward1, item1, mon1, form1, costume1))
+            if reward2:
+                im_lines.extend(self._quest_reward(reward2, item2, mon2, form2, costume2, False))
+                out_filename = Path(str(out_filename) + "_{}_{}_{}_{}_{}".format(reward2, item2, mon2, form2, costume2))
+            out_filename = Path(str(out_filename) + ".png")
+            return self._run_imagemagick(stop_image, im_lines, out_filename)
+        except TypeError:
+            return stop_image
 
     def _draw_raid_pokemon(self, pkm, form, costume, evolution):
         if self.use_pogo_assets:
@@ -343,10 +347,10 @@ class ImageGenerator:
         ]
 
     def _quest_reward(self, reward_type, item_id, pokemon_id, form_id, costume_id, left):
-        imgSize = 30
+        imgSize = 45
         imgPath = path_item / "0.png"
         if reward_type == 2:
-            imgPath = path_item / item_id + ".png"
+            imgPath = path_item / (str(item_id) + ".png")
         elif reward_type == 3:
             imgPath = path_item / "6.png"
         elif reward_type == 4:
@@ -355,7 +359,7 @@ class ImageGenerator:
             imgPath = self._pokemon_asset_path(
                 pokemon_id, form=form_id,
                 costume=costume_id)
-            imgSize = 35
+            imgSize = 50
         elif reward_type == 12:
             imgPath = path_item / "7.png"
         if left:

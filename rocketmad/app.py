@@ -1083,12 +1083,23 @@ def create_app():
 
     @app.route('/stop_img')
     def stop_img():
-        has_quest = request.args.get('quest')
+        has_quest = int(request.args.get('has_quest'))
         grunt = int(request.args.get('grunt'))
         lure = int(request.args.get('lure', '0'))
+        reward1 = int(request.args.get('reward1', 0))
+        item1 = int(request.args.get('item1', 0))
+        mon1 = int(request.args.get('mon1', 0))
+        form1 = int(request.args.get('form1', 0))
+        costume1 = int(request.args.get('costume1', 0))
+        reward2 = int(request.args.get('reward2', 0))
+        item2 = int(request.args.get('item2', 0))
+        mon2 = int(request.args.get('mon2', 0))
+        form2 = int(request.args.get('form2', 0))
+        costume2 = int(request.args.get('costume2', 0))
 
         return send_file(
-            image_generator.get_stop_icon(has_quest, grunt, lure),
+            image_generator.get_stop_icon(has_quest, grunt, lure, reward1, item1, mon1, form1, costume1, reward2, item2,
+                                          mon2, form2, costume2),
             mimetype='image/png'
         )
 
