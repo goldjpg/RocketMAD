@@ -101,47 +101,21 @@ function setupPokestopMarker(pokestop, isNotifPokestop) {
 }
 
 function updatePokestopMarker(pokestop, marker, isNotifPokestop) {
-    let shadowImage = null
-    let shadowSize = null
-    let shadowAnchor = null
+    
     const upscaleModifier = isNotifPokestop && settings.upscaleNotifMarkers ? 1.3 : 1
 
-    if (isPokestopMeetsQuestFilters(pokestop.quest)) {
-        const quest = pokestop.quest
-        shadowAnchor = [30, 30]
-        switch (quest.reward_type) {
-            case 2:
-                shadowImage = getItemImageUrl(quest.item_id)
-                shadowSize = [30, 30]
-                break
-            case 3:
-                shadowImage = getItemImageUrl(6)
-                shadowSize = [30, 30]
-                break
-            case 4:
-                shadowImage = getItemImageUrl(8)
-                shadowSize = [30, 30]
-                break
-            case 7:
-                shadowImage = getPokemonMapIconUrl({ pokemon_id: quest.pokemon_id, form: quest.form_id, costume: quest.costume_id }, serverSettings.generateImages)
-                shadowSize = [35, 35]
-                break
-            case 12:
-                shadowImage = getItemImageUrl(7)
-                shadowSize = [30, 30]
-        }
-    }
 
     const icon = L.contentIcon({
         iconUrl: getPokestopIconUrlFiltered(pokestop),
         iconSize: [32 * upscaleModifier, 32 * upscaleModifier],
         iconAnchor: [16 * upscaleModifier, 32 * upscaleModifier],
-        popupAnchor: [0, -16 * upscaleModifier],
-        shadowUrl: shadowImage,
-        shadowSize: shadowSize,
-        shadowAnchor: shadowAnchor
+        popupAnchor: [0, -16 * upscaleModifier]
     })
     marker.setIcon(icon)
+    var hasQuest = false
+    if(isPokestopMeetsQuestFilters(pokestop.quest) || isPokestopMeetsQuestFilters(pokestop.quest_ar)){
+        hasQuest = true
+    }
 
     if (isNotifPokestop) {
         marker.setZIndexOffset(pokestopNotifiedZIndex)
@@ -149,7 +123,7 @@ function updatePokestopMarker(pokestop, marker, isNotifPokestop) {
         marker.setZIndexOffset(pokestopInvasionZIndex)
     } else if (isLuredPokestop(pokestop)) {
         marker.setZIndexOffset(pokestopLureZIndex)
-    } else if (shadowImage !== null) {
+    } else if (hasQuest) {
         marker.setZIndexOffset(pokestopQuestZIndex)
     } else {
         marker.setZIndexOffset(pokestopZIndex)
@@ -581,18 +555,20 @@ function toggleInvasionNotif(id) { // eslint-disable-line no-unused-vars
 }
 
 function getPokestopIconUrlFiltered(pokestop) {
-    var imageName = 'stop'
+    var has_quest = 0
+    var grunt = 0
+    var lure = 0
     if (isPokestopMeetsQuestFilters(pokestop)) {
-        imageName += '_q'
+        has_quest = 1
     }
     if (isPokestopMeetsInvasionFilters(pokestop)) {
-        imageName += '_i_' + pokestop.incident_grunt_type
+        grunt = pokestop.incident_grunt_type
     }
     if (isPokestopMeetsLureFilters(pokestop)) {
-        imageName += '_l_' + pokestop.active_fort_modifier
+        lure = pokestop.active_fort_modifier
     }
 
-    return 'static/images/pokestop/' + imageName + '.png'
+    return `stop_img?has_quest=${has_quest}&grunt=${grunt}&lure=${lure}`
 }
 
 function getPokestopNotificationInfo(pokestop) {

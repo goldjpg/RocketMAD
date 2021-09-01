@@ -18,10 +18,13 @@ path_static = Path(args.root_path) / 'static'
 path_icons = path_static / 'icons'
 path_images = path_static / 'images'
 path_gym = path_images / 'gym'
+path_stop = path_images / 'pokestop'
+path_item = path_images / 'items'
 path_raid = path_images / 'raid'
 path_weather = path_images / 'weather'
 path_generated = path_images / 'generated'
 path_generated_gym = path_generated / 'gym'
+path_generated_stop = path_generated / 'stop'
 
 # Proto constants.
 GENDER_UNSET = 0
@@ -253,8 +256,8 @@ class ImageGenerator:
                                    if evolution > 0 else '')
             out_filename = (
                 path_generated_gym / "{}_L{}_R{}_P{}{}{}{}.png".format(
-                    team, level, raid_level, pkm, form_extension,
-                    costume_extension, evolution_extension))
+                team, level, raid_level, pkm, form_extension,
+                costume_extension, evolution_extension))
             im_lines.extend(self._draw_raid_pokemon(pkm, form, costume,
                                                     evolution))
             im_lines.extend(self._draw_raid_level(raid_level))
@@ -291,6 +294,21 @@ class ImageGenerator:
         gym_image = path_gym / '{}.png'.format(team)
         return self._run_imagemagick(gym_image, im_lines, out_filename)
 
+    def get_stop_icon(self, has_quest, grunt, lure, reward1, item1, mon1, form1, costume1, reward2, item2, mon2, form2, costume2):
+        stop_image = self._default_stop_image(has_quest, grunt, lure)
+        if not self.generate_images:
+            return stop_image
+        im_lines = []
+        out_filename = path_generated_stop / (stop_image.name.replace(".png", ""))
+        if reward1:
+            im_lines.extend(self._quest_reward(reward1, item1, mon1, form1, costume1, True))
+            out_filename += "_{}_{}_{}_{}_{}".format(reward1, item1, mon1, form1, costume1)
+        if reward2:
+            im_lines.extend(self._quest_reward(reward2, item2, mon2, form2, costume2, True))
+            out_filename += "_{}_{}_{}_{}_{}".format(reward2, item2, mon2, form2, costume2)
+        out_filename += ".png"
+        return self._run_imagemagick(stop_image, im_lines, out_filename)
+
     def _draw_raid_pokemon(self, pkm, form, costume, evolution):
         if self.use_pogo_assets:
             pkm_path, dummy = self._pokemon_asset_path(
@@ -321,6 +339,34 @@ class ImageGenerator:
         return [
             '-gravity SouthWest ( "{}" -resize 40x28 ) '.format(
                 path_gym / 'ex.png'),
+            '-geometry +0+0 -composite'
+        ]
+
+    def _quest_reward(self, reward_type, item_id, pokemon_id, form_id, costume_id, left):
+        imgSize = 30
+        imgPath = path_item / "0.png"
+        if reward_type == 2:
+            imgPath = path_item / item_id + ".png"
+        elif reward_type == 3:
+            imgPath = path_item / "6.png"
+        elif reward_type == 4:
+            imgPath = path_item / "8.png"
+        elif reward_type == 7:
+            imgPath = self._pokemon_asset_path(
+                pokemon_id, form=form_id,
+                costume=costume_id)
+            imgSize = 35
+        elif reward_type == 12:
+            imgPath = path_item / "7.png"
+        if left:
+            return self._draw_addon(imgPath, imgSize, "SouthWest")
+        else:
+            return self._draw_addon(imgPath, imgSize, "SouthEast")
+
+    def _draw_addon(self, image_path, size, gravity):
+        return [
+            '-gravity {} ( "{}" -resize {}x{} ) '.format(gravity,
+                                                         image_path, size, size),
             '-geometry +0+0 -composite'
         ]
 
@@ -431,7 +477,7 @@ class ImageGenerator:
         if should_use_asset_bundle_suffix:
             file_path = (
                 self.pokemon_icon_path / 'pokemon_icon{}{}.png'.format(
-                    gender_form_asset_suffix, shiny_suffix))
+                gender_form_asset_suffix, shiny_suffix))
         else:
             file_path = (
                 self.pokemon_icon_path / 'pokemon_icon_{:03d}{}{}{}.png'
@@ -515,6 +561,22 @@ class ImageGenerator:
             icon = "{}.png".format(team)
         if not (path / icon).is_file():
             icon = "{}_{}_unknown.png".format(team, raid_level)
+
+        return path / icon
+
+    def _default_stop_image(self, has_quest, grunt, lure):
+        path = path_stop
+        icon = "stop"
+        if has_quest > 0:
+            icon += "_q"
+        if grunt > 0:
+            icon += "_i_" + grunt
+        if lure > 0:
+            icon += "_l_" + lure
+        icon += ".png"
+
+        if not (path / icon).is_file():
+            icon = "stop.png"
 
         return path / icon
 

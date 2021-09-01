@@ -1081,6 +1081,17 @@ def create_app():
             mimetype='image/png'
         )
 
+    @app.route('/stop_img')
+    def stop_img():
+        has_quest = request.args.get('quest')
+        grunt = int(request.args.get('grunt'))
+        lure = int(request.args.get('lure', '0'))
+
+        return send_file(
+            image_generator.get_stop_icon(has_quest, grunt, lure),
+            mimetype='image/png'
+        )
+
     @app.route('/robots.txt')
     def render_robots_txt():
         return render_template('robots.txt')
