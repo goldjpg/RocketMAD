@@ -636,7 +636,6 @@ class Pokestop(db.Model):
             'active_fort_modifier', 'lure_expiration'
         ]
         Quest_AR = aliased(TrsQuest)
-        Quest_Not_AR = aliased(TrsQuest)
         if quests:
             quest_columns = [
                 'GUID', 'quest_timestamp', 'quest_task', 'quest_type',
@@ -652,7 +651,7 @@ class Pokestop(db.Model):
             reset_timestamp = datetime.timestamp(reset_time)
 
             query = (
-                db.session.query(Pokestop, Quest_AR, Quest_Not_AR)
+                db.session.query(Pokestop, TrsQuest, Quest_AR)
                     .outerjoin(
                     Quest_AR,
                     and_(
@@ -661,16 +660,17 @@ class Pokestop(db.Model):
                         Quest_AR.with_ar == 1
                     )
                 ).outerjoin(
-                    Quest_Not_AR,
+                    TrsQuest,
                     and_(
-                        Pokestop.pokestop_id == Quest_Not_AR.GUID,
-                        Quest_Not_AR.quest_timestamp >= reset_timestamp,
-                        Quest_Not_AR.with_ar == 0
+                        Pokestop.pokestop_id == TrsQuest.GUID,
+                        TrsQuest.quest_timestamp >= reset_timestamp,
+                        TrsQuest.with_ar == 0
                     )
                 )
                     .options(
                     Load(Pokestop).load_only(*columns),
-                    Load(TrsQuest).load_only(*quest_columns)
+                    Load(TrsQuest).load_only(*quest_columns),
+                    Load(Quest_AR).load_only(*quest_columns)
                 )
             )
         else:
@@ -680,7 +680,7 @@ class Pokestop(db.Model):
             conds = []
             if quests:
                 conds.append(Quest_AR.GUID.isnot(None))
-                conds.append(Quest_Not_AR.GUID.isnot(None))
+                conds.append(TrsQuest.GUID.isnot(None))
             if invasions:
                 conds.append(Pokestop.incident_expiration > datetime.utcnow())
             if lures:
@@ -719,6 +719,8 @@ class Pokestop(db.Model):
             sql = geofences_to_query(exclude_geofences, 'pokestop')
             query = query.filter(~text(sql))
 
+
+        #log.info(query.statement.compile(compile_kwargs={"literal_binds": True}))
         result = query.all()
 
         now = datetime.utcnow()
@@ -764,6 +766,10 @@ class Pokestop(db.Model):
                     'costume_id': quest_orm2.quest_pokemon_costume_id,
                     'stardust': quest_orm2.quest_stardust
                 }
+
+            #if quest_orm is not None and quest_orm2 is not None:
+                #log.info(orm_to_dict(quest_orm))
+                #log.info(orm_to_dict(quest_orm2))
 
             if (pokestop['incident_expiration'] is not None
                 and (pokestop['incident_expiration'] < now
