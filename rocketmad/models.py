@@ -727,8 +727,9 @@ class Pokestop(db.Model):
             pokestop_orm = r[0] if quests else r
             quest_orm = r[1] if quests else None
             quest_orm2 = None
-            if len(r) > 2:
-                quest_orm2 = r[2]
+            if quests:
+                if(len(r) > 2):
+                    quest_orm2 = r[2]
             pokestop = orm_to_dict(pokestop_orm)
             pokestop['quest'] = None
             pokestop['quest_ar'] = None

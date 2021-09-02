@@ -104,19 +104,18 @@ function updatePokestopMarker(pokestop, marker, isNotifPokestop) {
     
     const upscaleModifier = isNotifPokestop && settings.upscaleNotifMarkers ? 1.3 : 1
 
-
-    const icon = L.contentIcon({
-        iconUrl: getPokestopIconUrlFiltered(pokestop),
-        iconSize: [48 * upscaleModifier, 32 * upscaleModifier],
-        iconAnchor: [16 * upscaleModifier, 32 * upscaleModifier],
-        popupAnchor: [0, -16 * upscaleModifier]
-    })
-    marker.setIcon(icon)
     var hasQuest = false
     if(isPokestopMeetsQuestFilters(pokestop.quest) || isPokestopMeetsQuestFilters(pokestop.quest_ar)){
         hasQuest = true
     }
-
+    const iconWidth = hasQuest ? 48 : 32
+    const icon = L.contentIcon({
+        iconUrl: getPokestopIconUrlFiltered(pokestop),
+        iconSize: [iconWidth * upscaleModifier, 32 * upscaleModifier],
+        iconAnchor: [16 * upscaleModifier, 32 * upscaleModifier],
+        popupAnchor: [0, -16 * upscaleModifier]
+    })
+    marker.setIcon(icon)
     if (isNotifPokestop) {
         marker.setZIndexOffset(pokestopNotifiedZIndex)
     } else if (isInvadedPokestop(pokestop)) {
