@@ -27,7 +27,7 @@ function isPokestopMeetsQuestFilters(quest) {
             case 4: {
                 const id = '8_' + quest.item_amount
                 return !settings.excludedQuestItems.has(id)
-			}
+            }
             case 7: {
                 return !settings.excludedQuestPokemon.has(quest.pokemon_id)
             }
@@ -101,11 +101,10 @@ function setupPokestopMarker(pokestop, isNotifPokestop) {
 }
 
 function updatePokestopMarker(pokestop, marker, isNotifPokestop) {
-    
     const upscaleModifier = isNotifPokestop && settings.upscaleNotifMarkers ? 1.3 : 1
 
     var hasQuest = false
-    if(isPokestopMeetsQuestFilters(pokestop.quest) || isPokestopMeetsQuestFilters(pokestop.quest_ar)){
+    if (isPokestopMeetsQuestFilters(pokestop.quest) || isPokestopMeetsQuestFilters(pokestop.quest_ar)) {
         hasQuest = true
     }
     const iconWidth = hasQuest ? 48 : 32
@@ -162,8 +161,8 @@ function pokestopLabel(pokestop) {
     if (isPokestopMeetsQuestFilters(quest)) {
         questDisplay = getQuestLabel(pokestop, false)
     }
-    const quest_ar = pokestop.quest_ar
-    if (isPokestopMeetsQuestFilters(quest_ar)) {
+    const questAr = pokestop.quest_ar
+    if (isPokestopMeetsQuestFilters(questAr)) {
         questarDisplay = getQuestLabel(pokestop, true)
     }
 
@@ -283,8 +282,8 @@ function pokestopLabel(pokestop) {
         </div>`
 }
 
-function getQuestLabel(pokestop, is_ar){
-    const quest = is_ar ? pokestop.quest_ar : pokestop.quest
+function getQuestLabel(pokestop, isAr) {
+    const quest = isAr ? pokestop.quest_ar : pokestop.quest
     let rewardImageUrl
     let rewardText
     let isNotifQuest
@@ -332,8 +331,8 @@ function getQuestLabel(pokestop, is_ar){
 
     const notifText = isNotifQuest ? i18n('Don\'t notify') : i18n('Notify')
     const notifIconClass = isNotifQuest ? 'fas fa-bell-slash' : 'fas fa-bell'
-    const titleText = is_ar ? i18n('Quest (AR)') : i18n('Quest')
-     return `
+    const titleText = isAr ? i18n('Quest (AR)') : i18n('Quest')
+    return `
         <div class='section-divider'></div>
         <div class='pokestop-container'>
           <div class='pokestop-container-left'>
@@ -554,21 +553,21 @@ function toggleInvasionNotif(id) { // eslint-disable-line no-unused-vars
 }
 
 function getPokestopIconUrlFiltered(pokestop) {
-    var has_quest = 0
+    var hasQuest = 0
     var grunt = 0
     var lure = 0
-    var questquery = ""
+    var questquery = ''
     var count = 1
     const quests = [pokestop.quest, pokestop.quest_ar]
-    quests.forEach((quest)=>{
+    quests.forEach((quest) => {
         if (isPokestopMeetsQuestFilters(quest)) {
-            questquery += `&reward${count + "=" + quest.reward_type}&item${count + "=" + quest.item_id}&mon${count + "=" + quest.pokemon_id}&form${count + "=" + quest.form_id}&costume${count + "=" + quest.costume_id}`
-            count ++
+            questquery += `&reward${count + '=' + quest.reward_type}&item${count + '=' + quest.item_id}&mon${count + '=' + quest.pokemon_id}&form${count + '=' + quest.form_id}&costume${count + '=' + quest.costume_id}`
+            count++
         }
     })
-    
-    if(questquery != ""){
-        has_quest = 1
+
+    if (questquery !== '') {
+        hasQuest = 1
     }
     if (isPokestopMeetsInvasionFilters(pokestop)) {
         grunt = pokestop.incident_grunt_type
@@ -577,7 +576,7 @@ function getPokestopIconUrlFiltered(pokestop) {
         lure = pokestop.active_fort_modifier
     }
 
-    return `stop_img?has_quest=${has_quest}&grunt=${grunt}&lure=${lure + questquery}`
+    return `stop_img?has_quest=${hasQuest}&grunt=${grunt}&lure=${lure + questquery}`
 }
 
 function getPokestopNotificationInfo(pokestop) {
@@ -603,11 +602,13 @@ function getPokestopNotificationInfo(pokestop) {
                     }
                     break
                 }
-                case 4:
+                case 4: {
                     const itemId = '8_' + pokestop.quest.item_amount
                     if (settings.notifQuestItems.has(itemId)) {
                         questNotif = true
                     }
+                    break
+                }
                 case 7: {
                     if (settings.notifQuestPokemon.has(pokestop.quest.pokemon_id)) {
                         questNotif = true

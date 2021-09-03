@@ -275,17 +275,17 @@ function updateGymSidebar(id) {
         $('#sidebar-ongoing-raid-container').hide()
         $('#sidebar-upcoming-raid-container').hide()
     }
-    if(serverSettings.gymsMember && gym.slots_available < 6){
+    if (serverSettings.gymsMember && gym.slots_available < 6) {
         $('#sidebar-gymmember-loading-spinner').show()
-        $('#sidebar-gymmember-bottom-divider').show()    
-        for(var i=5; i>= 0;i--){
-            $('#sidebar-gymmember-container'+(i)).hide()
+        $('#sidebar-gymmember-bottom-divider').show()
+        for (var i = 5; i >= 0; i--) {
+            $('#sidebar-gymmember-container' + (i)).hide()
         }
         var data = $.ajax({
             url: 'get-gym',
             type: 'GET',
             data: {
-                'id': id
+                id: id
             },
             dataType: 'json',
             cache: false
@@ -293,46 +293,46 @@ function updateGymSidebar(id) {
         data.done(function (result) {
             if (result.length) {
                 result.forEach((pokemon, index) => {
-                    updatesidebargymmember(pokemon,index)
+                    updatesidebargymmember(pokemon, index)
                 })
             }
-            for(var i=6; i> result.length;i--){
-                $('#sidebar-gymmember-container'+(i-1)).hide()
+            for (var i = 6; i > result.length; i--) {
+                $('#sidebar-gymmember-container' + (i - 1)).hide()
             }
-            if(result.length == 0){
-                $('#sidebar-gymmember-bottom-divider').hide()    
+            if (result.length === 0) {
+                $('#sidebar-gymmember-bottom-divider').hide()
             }
             $('#sidebar-gymmember-loading-spinner').hide()
         })
-        data.fail(function (result) {         
+        data.fail(function (result) {
             $('#sidebar-gymmember-loading-spinner').hide()
         })
-    }else{
-        for(var i=5; i>= 0;i--){
-            $('#sidebar-gymmember-container'+(i)).hide()
+    } else {
+        for (var i2 = 5; i2 >= 0; i2--) {
+            $('#sidebar-gymmember-container' + (i2)).hide()
         }
-        $('#sidebar-gymmember-bottom-divider').hide()    
+        $('#sidebar-gymmember-bottom-divider').hide()
         $('#sidebar-gymmember-loading-spinner').hide()
     }
 }
 
 function updatesidebargymmember(pokemon, count) {
-    $('#sidebar-gymmember-container'+count).show()
+    $('#sidebar-gymmember-container' + count).show()
     var name = getPokemonName(pokemon.pokemon_id)
-    if(pokemon.nickname != null){
-        name += " (" + pokemon.nickname + ")"
+    if (pokemon.nickname != null) {
+        name += ' (' + pokemon.nickname + ')'
     }
     const fastMoveName = getMoveName(pokemon.move_1)
     const chargeMoveName = getMoveName(pokemon.move_2)
     const fastMoveType = getMoveTypeNoI8ln(pokemon.move_1)
     const chargeMoveType = getMoveTypeNoI8ln(pokemon.move_2)
 
-    $('#sidebar-gymmember-title'+count).html(`${name}`)
-    if(serverSettings.gymsTrainer){
-        $('#sidebar-gymmember-trainername-container'+count).html(`${i18n('Trainer')} ${pokemon.trainer}`)
+    $('#sidebar-gymmember-title' + count).html(`${name}`)
+    if (serverSettings.gymsTrainer) {
+        $('#sidebar-gymmember-trainername-container' + count).html(`${i18n('Trainer')} ${pokemon.trainer}`)
     }
-    $('#sidebar-gymmember-wpinfo-container'+count).html(`${i18n('CP')} ${pokemon.cp_now}`)
-    $('#sidebar-gymmember-pokemon-image'+count).attr('src', getPokemonRawIconUrl(pokemon, serverSettings.generateImages))
+    $('#sidebar-gymmember-wpinfo-container' + count).html(`${i18n('CP')} ${pokemon.cp_now}`)
+    $('#sidebar-gymmember-pokemon-image' + count).attr('src', getPokemonRawIconUrl(pokemon, serverSettings.generateImages))
     let typesDisplay = ''
     const types = getPokemonTypesNoI8ln(pokemon.pokemon_id, pokemon.form)
     $.each(types, function (index, type) {
@@ -341,70 +341,70 @@ function updatesidebargymmember(pokemon, count) {
         } else {
             typesDisplay += `<img src='static/images/types/${type.type.toLowerCase()}.png' title='${i18n(type.type)}' width='24'>`
         }
-    })      
-    $('#sidebar-gymmember-types-container'+count).html(typesDisplay)
-    $('#sidebar-gymmember-fast-move'+count).html(`${fastMoveName} <img class='move-type-icon' src='static/images/types/${fastMoveType.toLowerCase()}.png' title='${i18n(fastMoveType)}' width='15'>`)
-    $('#sidebar-gymmember-charge-move'+count).html(`${chargeMoveName} <img class='move-type-icon' src='static/images/types/${chargeMoveType.toLowerCase()}.png' title='${i18n(chargeMoveType)}' width='15'>`)
-    $('#sidebar-gymmember-deployed'+count).text(timestampToDateTime(pokemon.deployed))
-    $('#sidebar-gymmember-battles-won'+count).html(`${pokemon.battles_won}`)
-    $('#sidebar-gymmember-battles-lost'+count).html(`${pokemon.battles_lost}`)
-    $('#sidebar-gymmember-times-fed'+count).html(`${pokemon.times_fed}`)
-    if(pokemon.iv_attack != null && pokemon.iv_defense != null && pokemon.iv_stamina != null){
-        $('#sidebar-gymmember-iv'+count).html(`${pokemon.iv_attack}/${pokemon.iv_defense}/${pokemon.iv_stamina}`)
-    }else{
-        $('#sidebar-gymmember-iv'+count).html(`&nbsp;`)
+    })
+    $('#sidebar-gymmember-types-container' + count).html(typesDisplay)
+    $('#sidebar-gymmember-fast-move' + count).html(`${fastMoveName} <img class='move-type-icon' src='static/images/types/${fastMoveType.toLowerCase()}.png' title='${i18n(fastMoveType)}' width='15'>`)
+    $('#sidebar-gymmember-charge-move' + count).html(`${chargeMoveName} <img class='move-type-icon' src='static/images/types/${chargeMoveType.toLowerCase()}.png' title='${i18n(chargeMoveType)}' width='15'>`)
+    $('#sidebar-gymmember-deployed' + count).text(timestampToDateTime(pokemon.deployed))
+    $('#sidebar-gymmember-battles-won' + count).html(`${pokemon.battles_won}`)
+    $('#sidebar-gymmember-battles-lost' + count).html(`${pokemon.battles_lost}`)
+    $('#sidebar-gymmember-times-fed' + count).html(`${pokemon.times_fed}`)
+    if (pokemon.iv_attack != null && pokemon.iv_defense != null && pokemon.iv_stamina != null) {
+        $('#sidebar-gymmember-iv' + count).html(`${pokemon.iv_attack}/${pokemon.iv_defense}/${pokemon.iv_stamina}`)
+    } else {
+        $('#sidebar-gymmember-iv' + count).html('&nbsp;')
     }
-    $('#sidebar-gymmember-is-lucky'+count).html(`${getReadableData(pokemon.lucky)}`)
-    $('#sidebar-gymmember-is-purified'+count).html(`${getReadableData(pokemon.purified)}`)
-    $('#sidebar-gymmember-origin'+count).html(`${getReadableData(pokemon.origin)}`)
-    $('#sidebar-gymmember-origin-event'+count).html(`${getReadableData(pokemon.origin_event)}`)
-    if(serverSettings.gymsTrainer){
-        $('#sidebar-gymmember-traded-from'+count).html(`${getReadableData(pokemon.origin_traded_from)}`)
+    $('#sidebar-gymmember-is-lucky' + count).html(`${getReadableData(pokemon.lucky)}`)
+    $('#sidebar-gymmember-is-purified' + count).html(`${getReadableData(pokemon.purified)}`)
+    $('#sidebar-gymmember-origin' + count).html(`${getReadableData(pokemon.origin)}`)
+    $('#sidebar-gymmember-origin-event' + count).html(`${getReadableData(pokemon.origin_event)}`)
+    if (serverSettings.gymsTrainer) {
+        $('#sidebar-gymmember-traded-from' + count).html(`${getReadableData(pokemon.origin_traded_from)}`)
     }
-    $('#sidebar-gymmember-battles-attacked'+count).html(`${pokemon.battles_attacked}`)
-    $('#sidebar-gymmember-battles-defended'+count).html(`${pokemon.battles_defended}`)
-    $('#sidebar-gymmember-pvp-won'+count).html(`${pokemon.pvp_won}`)
-    $('#sidebar-gymmember-pvp-total'+count).html(`${pokemon.pvp_total}`)
-    $('#sidebar-gymmember-npc-won'+count).html(`${pokemon.npc_won}`)
-    $('#sidebar-gymmember-npc-total'+count).html(`${pokemon.npc_total}`)
-    toggleGymPokemonData(count,true)
+    $('#sidebar-gymmember-battles-attacked' + count).html(`${pokemon.battles_attacked}`)
+    $('#sidebar-gymmember-battles-defended' + count).html(`${pokemon.battles_defended}`)
+    $('#sidebar-gymmember-pvp-won' + count).html(`${pokemon.pvp_won}`)
+    $('#sidebar-gymmember-pvp-total' + count).html(`${pokemon.pvp_total}`)
+    $('#sidebar-gymmember-npc-won' + count).html(`${pokemon.npc_won}`)
+    $('#sidebar-gymmember-npc-total' + count).html(`${pokemon.npc_total}`)
+    toggleGymPokemonData(count, true)
 }
 
-function getReadableData(input){
-    if(input == 1){
-        return i18n("Yes")
-    }else if(input == 0){
-        return i18n("No")
-    }else if(input == null){
-        return "&nbsp;"
-    }else if(input == "egg_detail"){
-        return i18n("Egg")
-    }else if(input == "invasion_detail"){
-        return i18n("Rocket grunt")
-    }else if(input == "wild_detail"){
-        return i18n("Wild encounter")
-    }else if(input == "quest_detail"){
-        return i18n("Quest reward")
-    }else if(input == "raid_detail"){
-        return i18n("Raid encounter")
-    }else if(input == "vs_seeker_detail"){
-        return i18n("PVP reward")
-    }else if(input == "photobomb_detail"){
-        return i18n("Photobomb")
-    }else{
+function getReadableData(input) {
+    if (input === 1) {
+        return i18n('Yes')
+    } else if (input === 0) {
+        return i18n('No')
+    } else if (input == null) {
+        return '&nbsp;'
+    } else if (input === 'egg_detail') {
+        return i18n('Egg')
+    } else if (input === 'invasion_detail') {
+        return i18n('Rocket grunt')
+    } else if (input === 'wild_detail') {
+        return i18n('Wild encounter')
+    } else if (input === 'quest_detail') {
+        return i18n('Quest reward')
+    } else if (input === 'raid_detail') {
+        return i18n('Raid encounter')
+    } else if (input === 'vs_seeker_detail') {
+        return i18n('PVP reward')
+    } else if (input === 'photobomb_detail') {
+        return i18n('Photobomb')
+    } else {
         return i18n(input)
     }
 }
 
-function toggleGymPokemonData(index,hide) { // eslint-disable-line no-unused-vars   
-    if(hide){
-        $('#sidebar-gymmember-data-container'+index).hide()
-        $('#sidebar-gymmember-data-toggle'+index).html(`${i18n('Show Pokémon Details')} <i class="fas fa-chevron-down"></i>`)
-        $('#sidebar-gymmember-data-toggle'+index).attr('onclick', 'toggleGymPokemonData('+index+',false)')
-    }else{
-        $('#sidebar-gymmember-data-container'+index).show()
-        $('#sidebar-gymmember-data-toggle'+index).html(`${i18n('Hide Pokémon Details')} <i class="fas fa-chevron-up"></i>`)
-        $('#sidebar-gymmember-data-toggle'+index).attr('onclick', 'toggleGymPokemonData('+index+',true)') 
+function toggleGymPokemonData(index, hide) { // eslint-disable-line no-unused-vars
+    if (hide) {
+        $('#sidebar-gymmember-data-container' + index).hide()
+        $('#sidebar-gymmember-data-toggle' + index).html(`${i18n('Show Pokémon Details')} <i class="fas fa-chevron-down"></i>`)
+        $('#sidebar-gymmember-data-toggle' + index).attr('onclick', 'toggleGymPokemonData(' + index + ',false)')
+    } else {
+        $('#sidebar-gymmember-data-container' + index).show()
+        $('#sidebar-gymmember-data-toggle' + index).html(`${i18n('Hide Pokémon Details')} <i class="fas fa-chevron-up"></i>`)
+        $('#sidebar-gymmember-data-toggle' + index).attr('onclick', 'toggleGymPokemonData(' + index + ',true)')
     }
 }
 
@@ -554,12 +554,11 @@ function gymLabel(gym) {
     }
 
     let pokemonDisplay = ''
-    const panelid = gym.gym_id.replace(".", "");
-    if(serverSettings.gymsMember && gym.slots_available < 6){
-
+    const panelid = gym.gym_id.replace('.', '')
+    if (serverSettings.gymsMember && gym.slots_available < 6) {
         if (settings.showGymPokemon) {
-             pokemonDisplay = `<div class='section-divider'></div><div class="gymmember-pokemon-toggle" onclick="toggleGymMarkerPokemonData(true,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i></div><div class="gym-pokemon-container" id="marker-gymmember-data-container${panelid}">`
-             pokemonDisplay += `<div class="preloader-wrapper big active" id="gym-marker-loading-spinner${panelid}">
+            pokemonDisplay = `<div class='section-divider'></div><div class="gymmember-pokemon-toggle" onclick="toggleGymMarkerPokemonData(true,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i></div><div class="gym-pokemon-container" id="marker-gymmember-data-container${panelid}">`
+            pokemonDisplay += `<div class="preloader-wrapper big active" id="gym-marker-loading-spinner${panelid}">
              <div class="spinner-layer">
                <div class="circle-clipper left">
                  <div class="circle"></div>
@@ -572,7 +571,7 @@ function gymLabel(gym) {
                </div>
              </div>
            </div>`
-           loadGymMemberForMarker(gym.gym_id,true)
+            loadGymMemberForMarker(gym.gym_id, true)
         } else {
             pokemonDisplay = `<div class='section-divider'></div><div class="gymmember-pokemon-toggle" onclick="toggleGymMarkerPokemonData(false,'${gym.gym_id}')" id="marker-gymmember-data-toggle${panelid}">${i18n('Show Pokémon')} <i class="fas fa-chevron-down"></i></div><div class="gym-pokemon-container" style="display:none" id="marker-gymmember-data-container${panelid}">`
         }
@@ -615,9 +614,9 @@ function gymLabel(gym) {
         </div>`
 }
 
-function loadGymMemberForMarker(gymid,hasloading) { // eslint-disable-line no-unused-vars   
-    const labelid = gymid.replace(".","")
-    if(!hasloading){
+function loadGymMemberForMarker(gymid, hasloading) { // eslint-disable-line no-unused-vars
+    const labelid = gymid.replace('.', '')
+    if (!hasloading) {
         var defenderhtml = `<div class="preloader-wrapper big active" id="gym-marker-loading-spinner${labelid}">
         <div class="spinner-layer">
           <div class="circle-clipper left">
@@ -631,27 +630,25 @@ function loadGymMemberForMarker(gymid,hasloading) { // eslint-disable-line no-un
           </div>
         </div>
       </div>`
-      $('#marker-gymmember-data-container'+labelid).html(defenderhtml)
+        $('#marker-gymmember-data-container' + labelid).html(defenderhtml)
     }
-    
+
     var data = $.ajax({
         url: 'get-gym',
         type: 'GET',
         data: {
-            'id': gymid
+            id: gymid
         },
         dataType: 'json',
         cache: false
     })
     data.done(function (result) {
-        defenderhtml = ""
-        var trainerhtml = ""
+        defenderhtml = ''
+        var trainerhtml = ''
         if (result.length) {
             result.forEach((pokemon) => {
-                if(serverSettings.gymsTrainer){
-                    trainerhtml = `<div>
-                        	            ${i18n('Trainer')}: <strong>${pokemon.trainer}</strong>
-                                   </div>`
+                if (serverSettings.gymsTrainer) {
+                    trainerhtml = `<div>${i18n('Trainer')}: <strong>${pokemon.trainer}</strong></div>`
                 }
                 defenderhtml += `
                 <div id="member-container">
@@ -674,38 +671,38 @@ function loadGymMemberForMarker(gymid,hasloading) { // eslint-disable-line no-un
                 </div>`
             })
         }
-        if(result.length == 0){
-            $('#marker-gymmember-data-container'+labelid).html(i18n('No data'))
-        }else{
-            $('#marker-gymmember-data-container'+labelid).html(defenderhtml)
+        if (result.length === 0) {
+            $('#marker-gymmember-data-container' + labelid).html(i18n('No data'))
+        } else {
+            $('#marker-gymmember-data-container' + labelid).html(defenderhtml)
         }
         $(`#gym-marker-loading-spinner${labelid}`).hide()
         mapData.gyms[gymid].marker.getPopup().setContent($(`gymlabel${labelid}`).html())
     })
-    data.fail(function (result) {         
-        $('#marker-gymmember-data-container'+labelid).html(i18n('Error'))
+    data.fail(function (result) {
+        $('#marker-gymmember-data-container' + labelid).html(i18n('Error'))
         $(`#gym-marker-loading-spinner${labelid}`).hide()
         mapData.gyms[gymid].marker.getPopup().setContent($(`gymlabel${labelid}`).html())
     })
 }
 
-function toggleGymMarkerPokemonData(hide, gymid) { // eslint-disable-line no-unused-vars   
-    const labelid = gymid.replace(".","")
-    if(hide){
+function toggleGymMarkerPokemonData(hide, gymid) { // eslint-disable-line no-unused-vars
+    const labelid = gymid.replace('.', '')
+    if (hide) {
         settings.showGymPokemon = false
-        $('#marker-gymmember-data-container'+labelid).hide()
-        $('#marker-gymmember-data-toggle'+labelid).html(`${i18n('Show Pokémon')} <i class="fas fa-chevron-down"></i>`)
-        $('#marker-gymmember-data-toggle'+labelid).attr('onclick', `toggleGymMarkerPokemonData(false,'${gymid}')`)
-    }else{
+        $('#marker-gymmember-data-container' + labelid).hide()
+        $('#marker-gymmember-data-toggle' + labelid).html(`${i18n('Show Pokémon')} <i class="fas fa-chevron-down"></i>`)
+        $('#marker-gymmember-data-toggle' + labelid).attr('onclick', `toggleGymMarkerPokemonData(false,'${gymid}')`)
+    } else {
         settings.showGymPokemon = true
-        $('#marker-gymmember-data-container'+labelid).show()
-        $('#marker-gymmember-data-toggle'+labelid).html(`${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i>`)
-        $('#marker-gymmember-data-toggle'+labelid).attr('onclick', `toggleGymMarkerPokemonData(true,'${gymid}')`) 
-        loadGymMemberForMarker(gymid,false)
+        $('#marker-gymmember-data-container' + labelid).show()
+        $('#marker-gymmember-data-toggle' + labelid).html(`${i18n('Hide Pokémon')} <i class="fas fa-chevron-up"></i>`)
+        $('#marker-gymmember-data-toggle' + labelid).attr('onclick', `toggleGymMarkerPokemonData(true,'${gymid}')`)
+        loadGymMemberForMarker(gymid, false)
     }
 }
 
-function updateGymLabel(gym,marker) {
+function updateGymLabel(gym, marker) {
     marker.getPopup().setContent(gymLabel(gym))
     if (marker.isPopupOpen() && isValidRaid(gym.raid)) {
         // Update countdown time to prevent a countdown time of 0.

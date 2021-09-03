@@ -3,7 +3,8 @@ exported genderClasses, getIvsPercentage, getIvsPercentageCssColor,
 getMoveName, getMoveType, getMoveTypeNoI8ln, getPokemonGen, getPokemonIds,
 getPokemonLevel, getPokemonNameWithForm, getPokemonRarity,
 getPokemonRarityName, getPokemonRawIconUrl, getPokemonTypes, initMoveData,
-initPokemonData, searchPokemon, createPokemonMarker, updatePokemonRarities
+initPokemonData, searchPokemon, createPokemonMarker, updatePokemonRarities,
+getLocationInCell, getLocationNearStop
 */
 
 var pokemonData = {}
@@ -241,7 +242,7 @@ function createPokemonMarker(pokemon, generateImages) {
         iconUrl: getPokemonMapIconUrl(pokemon, generateImages),
         iconSize: [32, 32]
     })
-    
+
     let offsetLat = 0
     let offsetLon = 0
     if (pokemon.seen_type === 'nearby_stop' || pokemon.seen_type === 'nearby_cell') {

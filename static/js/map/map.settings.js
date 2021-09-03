@@ -206,7 +206,7 @@ function initSettingsSidebar() {
         $('#exclude-nearby-cell-switch').on('change', function () {
             settings.excludeNearbyCells = this.checked
             updateMap({ loadAllPokemon: true })
-            //TODO: fix bug             updatePokemons()
+            updatePokemons()
             Store.set('excludeNearbyCells', this.checked)
         })
         $('#pokemon-icon-size-select').on('change', function () {
