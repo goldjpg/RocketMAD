@@ -111,6 +111,7 @@ const settings = {
     showSpawnpoints: null,
     showScannedLocations: null,
     showNests: null,
+    excludeNearbyCells: null,
     showExParks: null,
     showNestParks: null,
     showS2Cells: null,

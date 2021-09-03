@@ -23,6 +23,7 @@ function initSettings() {
         settings.showNotifPokemonOnly = Store.get('showNotifPokemonOnly')
         settings.showNotifPokemonAlways = Store.get('showNotifPokemonAlways')
         settings.playCries = serverSettings.pokemonCries && Store.get('playCries')
+        settings.excludeNearbyCells = Store.get('excludeNearbyCells')
     }
     if (serverSettings.pokemonValues) {
         settings.filterPokemonByValues = Store.get('filterPokemonByValues')
