@@ -815,7 +815,7 @@ class TrsQuest(db.Model):
     quest_pokemon_costume_id = db.Column(
         db.SmallInteger, default=0, nullable=False
     )
-    with_ar = db.Column(TINYINT, nullable=False)
+    with_ar = db.Column(TINYINT, nullable=False, primary_key=True)
 
     __table_args__ = (
         Index('quest_type', 'quest_type'),
