@@ -107,12 +107,13 @@ function updatePokestopMarker(pokestop, marker, isNotifPokestop) {
     if (isPokestopMeetsQuestFilters(pokestop.quest) || isPokestopMeetsQuestFilters(pokestop.quest_ar)) {
         hasQuest = true
     }
-    const iconWidth = hasQuest ? 48 : 32
+    const iconWidth = hasQuest ? 55 : 32
+    const iconHeight = hasQuest ? 48 : 32
     const icon = L.contentIcon({
         iconUrl: getPokestopIconUrlFiltered(pokestop),
-        iconSize: [iconWidth * upscaleModifier, 32 * upscaleModifier],
-        iconAnchor: [16 * upscaleModifier, 32 * upscaleModifier],
-        popupAnchor: [0, -16 * upscaleModifier]
+        iconSize: [iconWidth * upscaleModifier, iconHeight * upscaleModifier],
+        iconAnchor: [(iconWidth / 2) * upscaleModifier, iconHeight * upscaleModifier],
+        popupAnchor: [0, (iconHeight / -2) * upscaleModifier]
     })
     marker.setIcon(icon)
     if (isNotifPokestop) {
@@ -562,11 +563,13 @@ function getPokestopIconUrlFiltered(pokestop) {
     quests.forEach((quest) => {
         if (isPokestopMeetsQuestFilters(quest)) {
             questquery += `&reward${count + '=' + quest.reward_type}&item${count + '=' + quest.item_id}&mon${count + '=' + quest.pokemon_id}&form${count + '=' + quest.form_id}&costume${count + '=' + quest.costume_id}`
-            count++
+        } else {
+            questquery += `&reward${count}=0`
         }
+        count++
     })
 
-    if (questquery !== '') {
+    if (questquery.includes('item')) {
         hasQuest = 1
     }
     if (isPokestopMeetsInvasionFilters(pokestop)) {
@@ -579,48 +582,58 @@ function getPokestopIconUrlFiltered(pokestop) {
     return `stop_img?has_quest=${hasQuest}&grunt=${grunt}&lure=${lure + questquery}`
 }
 
+function filterQuestNotification(quest) {
+    var questNotif = false
+    switch (quest.reward_type) {
+        case 2: {
+            const itemId = quest.item_id + '_' + quest.item_amount
+            if (settings.notifQuestItems.has(itemId)) {
+                questNotif = true
+            }
+            break
+        }
+        case 3: {
+            const itemId = '6_' + quest.stardust
+            if (settings.notifQuestItems.has(itemId)) {
+                questNotif = true
+            }
+            break
+        }
+        case 4: {
+            const itemId = '8_' + quest.item_amount
+            if (settings.notifQuestItems.has(itemId)) {
+                questNotif = true
+            }
+            break
+        }
+        case 7: {
+            if (settings.notifQuestPokemon.has(quest.pokemon_id)) {
+                questNotif = true
+            }
+            break
+        }
+        case 12: {
+            const itemId = '7_' + quest.item_amount
+            if (settings.notifQuestItems.has(itemId)) {
+                questNotif = true
+            }
+        }
+    }
+    return questNotif
+}
+
 function getPokestopNotificationInfo(pokestop) {
-    let questNotif = false
+    const questNotif = false
     let invasionNotif = false
     let lureNotif = false
     let newNotif = false
     if (settings.pokestopNotifs) {
         const id = pokestop.pokestop_id
-        if (settings.questNotifs && isPokestopMeetsQuestFilters(pokestop)) {
-            switch (pokestop.quest.reward_type) {
-                case 2: {
-                    const itemId = pokestop.quest.item_id + '_' + pokestop.quest.item_amount
-                    if (settings.notifQuestItems.has(itemId)) {
-                        questNotif = true
-                    }
-                    break
-                }
-                case 3: {
-                    const itemId = '6_' + pokestop.quest.stardust
-                    if (settings.notifQuestItems.has(itemId)) {
-                        questNotif = true
-                    }
-                    break
-                }
-                case 4: {
-                    const itemId = '8_' + pokestop.quest.item_amount
-                    if (settings.notifQuestItems.has(itemId)) {
-                        questNotif = true
-                    }
-                    break
-                }
-                case 7: {
-                    if (settings.notifQuestPokemon.has(pokestop.quest.pokemon_id)) {
-                        questNotif = true
-                    }
-                    break
-                }
-                case 12: {
-                    const itemId = '7_' + pokestop.quest.item_amount
-                    if (settings.notifQuestItems.has(itemId)) {
-                        questNotif = true
-                    }
-                }
+        if (settings.questNotifs) {
+            if (isPokestopMeetsQuestFilters(pokestop.quest)) {
+                filterQuestNotification(pokestop.quest)
+            } else if (isPokestopMeetsQuestFilters(pokestop.quest_ar)) {
+                filterQuestNotification(pokestop.quest_ar)
             }
         }
 

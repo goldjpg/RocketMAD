@@ -297,16 +297,16 @@ class ImageGenerator:
     def get_stop_icon(self, has_quest, grunt, lure, reward1=0, item1=0, mon1=0, form1=0, costume1=0, reward2=0, item2=0,
                       mon2=0, form2=0, costume2=0):
         stop_image = self._default_stop_image(has_quest, grunt, lure)
-        if not self.generate_images or not reward1:
+        if not self.generate_images or (reward1 == 0 and reward2 == 0):
             return stop_image
         try:
-            im_lines = ['-background none -gravity center -extent 96x64 ']
+            im_lines = ['-background none -gravity center -extent 110x96 ']
             out_filename = path_generated_stop / (stop_image.name.replace(".png", ""))
             if reward1:
-                im_lines.extend(self._quest_reward(reward1, item1, mon1, form1, costume1, True))
+                im_lines.extend(self._quest_reward(reward1, item1, mon1, form1, costume1, False))
                 out_filename = Path(str(out_filename) + "_{}_{}_{}_{}_{}".format(reward1, item1, mon1, form1, costume1))
             if reward2:
-                im_lines.extend(self._quest_reward(reward2, item2, mon2, form2, costume2, False))
+                im_lines.extend(self._quest_reward(reward2, item2, mon2, form2, costume2, True))
                 out_filename = Path(str(out_filename) + "_{}_{}_{}_{}_{}".format(reward2, item2, mon2, form2, costume2))
             out_filename = Path(str(out_filename) + ".png")
             return self._run_imagemagick(stop_image, im_lines, out_filename)
@@ -347,7 +347,7 @@ class ImageGenerator:
             '-geometry +0+0 -composite'
         ]
 
-    def _quest_reward(self, reward_type, item_id, pokemon_id, form_id, costume_id, left):
+    def _quest_reward(self, reward_type, item_id, pokemon_id, form_id, costume_id, is_ar):
         imgSize = 45
         imgPath = path_item / "0.png"
         if reward_type == 2:
@@ -369,16 +369,21 @@ class ImageGenerator:
             imgSize = 75
         elif reward_type == 12:
             imgPath = path_item / "7.png"
-        if left:
-            return self._draw_addon(imgPath, imgSize, "SouthWest")
+        if is_ar:
+            return self._draw_addon(imgPath, imgSize, "NorthWest")
         else:
-            return self._draw_addon(imgPath, imgSize, "SouthEast")
+            return self._draw_addon(imgPath, imgSize, "SouthWest")
 
     def _draw_addon(self, image_path, size, gravity):
+        offset = ""
+        if size < 50:
+            offset = "+0+0"
+        else:
+            offset = "-10-10"
         return [
             '-gravity {} ( "{}" -resize {}x{} ) '.format(gravity,
                                                          image_path, size, size),
-            '-geometry +0+0 -composite'
+            '-geometry {} -composite'.format(offset)
         ]
 
     def _battle_indicator_boom(self):
@@ -592,7 +597,7 @@ class ImageGenerator:
         return path / icon
 
     def _run_imagemagick(self, source, im_lines, out_file):
-        if not out_file.is_file():
+        #if not out_file.is_file():
             # Make sure, target path exists
             out_file.parent.mkdir(parents=True, exist_ok=True)
 
@@ -603,4 +608,4 @@ class ImageGenerator:
                 cmd = cmd.replace(" ( ", " \\( ").replace(" ) ", " \\) ")
             log.info("Generating icon '{}'".format(out_file))
             subprocess.call(cmd, shell=True)
-        return str(out_file)
+            return str(out_file)
