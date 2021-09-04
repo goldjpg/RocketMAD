@@ -301,15 +301,19 @@ class ImageGenerator:
             return stop_image
         try:
             im_lines = ['-background none -gravity center -extent 110x96 ']
-            out_filename = path_generated_stop / (stop_image.name.replace(".png", ""))
-            if reward1:
+            out_filename = stop_image.name.replace(".png", "")
+            if reward1 != 0:
                 im_lines.extend(self._quest_reward(reward1, item1, mon1, form1, costume1, False))
-                out_filename = Path(str(out_filename) + "_{}_{}_{}_{}_{}".format(reward1, item1, mon1, form1, costume1))
-            if reward2:
+                out_filename += "_{}_{}_{}_{}_{}".format(reward1, item1, mon1, form1, costume1)
+                if reward2 == 0:
+                    out_filename += "_non_ar"
+            if reward2 != 0:
                 im_lines.extend(self._quest_reward(reward2, item2, mon2, form2, costume2, True))
-                out_filename = Path(str(out_filename) + "_{}_{}_{}_{}_{}".format(reward2, item2, mon2, form2, costume2))
-            out_filename = Path(str(out_filename) + ".png")
-            return self._run_imagemagick(stop_image, im_lines, out_filename)
+                out_filename += "_{}_{}_{}_{}_{}".format(reward2, item2, mon2, form2, costume2)
+                if reward1 == 0:
+                    out_filename += "_ar"
+            out_filename += ".png"
+            return self._run_imagemagick(stop_image, im_lines, path_generated_stop / out_filename)
         except Exception as e:
             log.warning("Can't generate stop image")
             return stop_image
