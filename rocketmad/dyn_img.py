@@ -580,9 +580,9 @@ class ImageGenerator:
         if has_quest > 0:
             icon += "_q"
         if grunt > 0:
-            icon += "_i_" + grunt
+            icon += "_i_" + str(grunt)
         if lure > 0:
-            icon += "_l_" + lure
+            icon += "_l_" + str(lure)
         icon += ".png"
 
         if not (path / icon).is_file():
