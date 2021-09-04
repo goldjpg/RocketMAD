@@ -348,7 +348,7 @@ class ImageGenerator:
         ]
 
     def _quest_reward(self, reward_type, item_id, pokemon_id, form_id, costume_id, is_ar):
-        imgSize = 45
+        imgSize = 55
         imgPath = path_item / "0.png"
         if reward_type == 2:
             imgPath = path_item / (str(item_id) + ".png")
@@ -361,12 +361,11 @@ class ImageGenerator:
                 pokemon_id, form=form_id,
                 costume=costume_id)
             if not Path(str(imgPath)).is_file():
-                imgPath = self._get_old_pokemon_asset_path(
+                imgPath = self.get_pokemon_map_icon(
                     pokemon_id, form=form_id,
                     costume=costume_id)
             if not Path(str(imgPath)).is_file():
                 raise FileNotFoundError("No pokemon icon " + imgPath + " does not exist")
-            imgSize = 75
         elif reward_type == 12:
             imgPath = path_item / "7.png"
         if is_ar:
@@ -375,15 +374,10 @@ class ImageGenerator:
             return self._draw_addon(imgPath, imgSize, "SouthWest")
 
     def _draw_addon(self, image_path, size, gravity):
-        offset = ""
-        if size < 50:
-            offset = "+0+0"
-        else:
-            offset = "-10-10"
         return [
             '-gravity {} ( "{}" -resize {}x{} ) '.format(gravity,
                                                          image_path, size, size),
-            '-geometry {} -composite'.format(offset)
+            '-geometry +0+0 -composite'
         ]
 
     def _battle_indicator_boom(self):
@@ -597,7 +591,7 @@ class ImageGenerator:
         return path / icon
 
     def _run_imagemagick(self, source, im_lines, out_file):
-        #if not out_file.is_file():
+        if not out_file.is_file():
             # Make sure, target path exists
             out_file.parent.mkdir(parents=True, exist_ok=True)
 
@@ -608,4 +602,4 @@ class ImageGenerator:
                 cmd = cmd.replace(" ( ", " \\( ").replace(" ) ", " \\) ")
             log.info("Generating icon '{}'".format(out_file))
             subprocess.call(cmd, shell=True)
-            return str(out_file)
+        return str(out_file)
