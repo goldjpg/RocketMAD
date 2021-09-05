@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, Index, text
 from sqlalchemy.dialects.mysql import BIGINT, DOUBLE, LONGTEXT, TINYINT
-from sqlalchemy.orm import Load, load_only
+from sqlalchemy.orm import Load, load_only, aliased
 from sqlalchemy.sql.expression import and_, or_
 from timeit import default_timer
 
@@ -52,6 +52,8 @@ class Pokemon(db.Model):
     )
     weather_boosted_condition = db.Column(db.SmallInteger)
     last_modified = db.Column(db.DateTime)
+    seen_type = db.Column(db.String)
+    fort_id = db.Column(db.String)
 
     __table_args__ = (
         Index('pokemon_spawnpoint_id', 'spawnpoint_id'),
@@ -66,7 +68,7 @@ class Pokemon(db.Model):
     def get_active(swLat, swLng, neLat, neLng, oSwLat=None, oSwLng=None,
                    oNeLat=None, oNeLng=None, timestamp=0, eids=None, ids=None,
                    geofences=None, exclude_geofences=None,
-                   verified_despawn_time=False):
+                   verified_despawn_time=False, exclude_nearby_cells=True):
         columns = [
             Pokemon.encounter_id, Pokemon.pokemon_id, Pokemon.latitude,
             Pokemon.longitude, Pokemon.disappear_time,
@@ -75,7 +77,7 @@ class Pokemon(db.Model):
             Pokemon.cp, Pokemon.cp_multiplier, Pokemon.weight, Pokemon.height,
             Pokemon.gender, Pokemon.form, Pokemon.costume,
             Pokemon.catch_prob_1, Pokemon.catch_prob_2, Pokemon.catch_prob_3,
-            Pokemon.weather_boosted_condition, Pokemon.last_modified
+            Pokemon.weather_boosted_condition, Pokemon.last_modified, Pokemon.seen_type
         ]
 
         if verified_despawn_time:
@@ -91,7 +93,11 @@ class Pokemon(db.Model):
         else:
             query = db.session.query(*columns)
 
-        query = query.filter(Pokemon.disappear_time > datetime.utcnow())
+        filter_term = (Pokemon.disappear_time > datetime.utcnow())
+        query = query.filter(filter_term)
+
+        if exclude_nearby_cells:
+            query = query.filter(Pokemon.seen_type != "nearby_cell")
 
         if timestamp > 0:
             # If timestamp is known only load modified Pokémon.
@@ -387,7 +393,7 @@ class Gym(db.Model):
 
         # I was too lost to use the models here with this complex query so please someone help...
         querryresult = db.engine.execute(
-            "select * from cev_gympokemon gp left join cev_trainer_pokemon tp on tp.uuid = gp.pokemon_uuid where (gp.gym_id, gp.last_seen) in (select gp2.gym_id, max(gp2.last_seen) from cev_gympokemon gp2 group by gp2.gym_id) and gp.gym_id = '"+gymid+"' order by gp.deployed desc")
+            "select * from cev_gympokemon gp left join cev_trainer_pokemon tp on tp.uuid = gp.pokemon_uuid where (gp.gym_id, gp.last_seen) in (select gp2.gym_id, max(gp2.last_seen) from cev_gympokemon gp2 group by gp2.gym_id) and gp.gym_id = '" + gymid + "' order by gp.deployed desc")
 
         for row in querryresult:
             p = {}
@@ -629,7 +635,7 @@ class Pokestop(db.Model):
             'last_updated', 'incident_grunt_type', 'incident_expiration',
             'active_fort_modifier', 'lure_expiration'
         ]
-
+        Quest_AR = aliased(TrsQuest)
         if quests:
             quest_columns = [
                 'GUID', 'quest_timestamp', 'quest_task', 'quest_type',
@@ -643,19 +649,28 @@ class Pokestop(db.Model):
                 hour=hours, minute=minutes, second=0, microsecond=0
             )
             reset_timestamp = datetime.timestamp(reset_time)
+
             query = (
-                db.session.query(Pokestop, TrsQuest)
+                db.session.query(Pokestop, TrsQuest, Quest_AR)
                     .outerjoin(
+                    Quest_AR,
+                    and_(
+                        Pokestop.pokestop_id == Quest_AR.GUID,
+                        Quest_AR.quest_timestamp >= reset_timestamp,
+                        Quest_AR.with_ar == 1
+                    )
+                ).outerjoin(
                     TrsQuest,
                     and_(
                         Pokestop.pokestop_id == TrsQuest.GUID,
                         TrsQuest.quest_timestamp >= reset_timestamp,
-                        TrsQuest.with_ar == 1
+                        TrsQuest.with_ar == 0
                     )
                 )
                     .options(
                     Load(Pokestop).load_only(*columns),
-                    Load(TrsQuest).load_only(*quest_columns)
+                    Load(TrsQuest).load_only(*quest_columns),
+                    Load(Quest_AR).load_only(*quest_columns)
                 )
             )
         else:
@@ -664,6 +679,7 @@ class Pokestop(db.Model):
         if not eventless_stops:
             conds = []
             if quests:
+                conds.append(Quest_AR.GUID.isnot(None))
                 conds.append(TrsQuest.GUID.isnot(None))
             if invasions:
                 conds.append(Pokestop.incident_expiration > datetime.utcnow())
@@ -703,6 +719,8 @@ class Pokestop(db.Model):
             sql = geofences_to_query(exclude_geofences, 'pokestop')
             query = query.filter(~text(sql))
 
+
+        #log.info(query.statement.compile(compile_kwargs={"literal_binds": True}))
         result = query.all()
 
         now = datetime.utcnow()
@@ -710,9 +728,18 @@ class Pokestop(db.Model):
         for r in result:
             pokestop_orm = r[0] if quests else r
             quest_orm = r[1] if quests else None
+            quest_orm2 = None
+            if quests:
+                if(len(r) > 2):
+                    quest_orm2 = r[2]
             pokestop = orm_to_dict(pokestop_orm)
+            pokestop['quest'] = None
+            pokestop['quest_ar'] = None
             if quest_orm is not None:
-                pokestop['quest'] = {
+                questtype = "quest"
+                if quest_orm.with_ar == 1:
+                    questtype = "quest_ar"
+                pokestop[questtype] = {
                     'scanned_at': quest_orm.quest_timestamp * 1000,
                     'task': quest_orm.quest_task,
                     'reward_type': quest_orm.quest_reward_type,
@@ -723,8 +750,27 @@ class Pokestop(db.Model):
                     'costume_id': quest_orm.quest_pokemon_costume_id,
                     'stardust': quest_orm.quest_stardust
                 }
-            else:
-                pokestop['quest'] = None
+
+            if quest_orm2 is not None:
+                questtype = "quest"
+                if quest_orm2.with_ar == 1:
+                    questtype = "quest_ar"
+                pokestop[questtype] = {
+                    'scanned_at': quest_orm2.quest_timestamp * 1000,
+                    'task': quest_orm2.quest_task,
+                    'reward_type': quest_orm2.quest_reward_type,
+                    'item_id': quest_orm2.quest_item_id,
+                    'item_amount': quest_orm2.quest_item_amount,
+                    'pokemon_id': quest_orm2.quest_pokemon_id,
+                    'form_id': quest_orm2.quest_pokemon_form_id,
+                    'costume_id': quest_orm2.quest_pokemon_costume_id,
+                    'stardust': quest_orm2.quest_stardust
+                }
+
+            #if quest_orm is not None and quest_orm2 is not None:
+                #log.info(orm_to_dict(quest_orm))
+                #log.info(orm_to_dict(quest_orm2))
+
             if (pokestop['incident_expiration'] is not None
                 and (pokestop['incident_expiration'] < now
                      or not invasions)):
@@ -769,8 +815,7 @@ class TrsQuest(db.Model):
     quest_pokemon_costume_id = db.Column(
         db.SmallInteger, default=0, nullable=False
     )
-    with_ar = db.Column(TINYINT, nullable=False)
-
+    with_ar = db.Column(TINYINT, nullable=False, primary_key=True)
 
     __table_args__ = (
         Index('quest_type', 'quest_type'),

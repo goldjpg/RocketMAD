@@ -23,6 +23,7 @@ function initSettings() {
         settings.showNotifPokemonOnly = Store.get('showNotifPokemonOnly')
         settings.showNotifPokemonAlways = Store.get('showNotifPokemonAlways')
         settings.playCries = serverSettings.pokemonCries && Store.get('playCries')
+        settings.excludeNearbyCells = Store.get('excludeNearbyCells')
     }
     if (serverSettings.pokemonValues) {
         settings.filterPokemonByValues = Store.get('filterPokemonByValues')
@@ -203,6 +204,12 @@ function initSettingsSidebar() {
             Store.set('filterPokemonById', this.checked)
         })
 
+        $('#exclude-nearby-cell-switch').on('change', function () {
+            settings.excludeNearbyCells = this.checked
+            updateMap({ loadAllPokemon: true })
+            updatePokemons()
+            Store.set('excludeNearbyCells', this.checked)
+        })
         $('#pokemon-icon-size-select').on('change', function () {
             const iconSize = Number(this.value)
             settings.pokemonIconSizeModifier = iconSize
@@ -1379,6 +1386,7 @@ function initSettingsSidebar() {
         $('#filter-pokemon-switch').prop('checked', settings.filterPokemonById)
         $('a[data-target="pokemon-filter-modal"]').toggle(settings.filterPokemonById)
         $('#pokemon-icon-size-select').val(settings.pokemonIconSizeModifier)
+        $('#exclude-nearby-cell-switch').prop('checked', settings.excludeNearbyCells)
     }
     if (serverSettings.pokemonValues) {
         $('#pokemon-values-switch').prop('checked', settings.showPokemonValues)
