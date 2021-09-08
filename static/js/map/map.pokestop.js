@@ -94,7 +94,7 @@ function setupPokestopMarker(pokestop, isNotifPokestop) {
 
     marker.pokestop_id = pokestop.pokestop_id
     updatePokestopMarker(pokestop, marker, isNotifPokestop)
-    marker.bindPopup('', { autoPan: autoPanPopup() })
+    marker.bindPopup('', { autoPan: autoPanPopup(), maxHeight: 400 })
     addListeners(marker, 'pokestop')
 
     return marker
