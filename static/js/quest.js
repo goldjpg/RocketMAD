@@ -49,7 +49,12 @@ function loadQuests() {
             if (!pokestop.quest) {
                 return true
             }
-            table.row.add(pokestop)
+            if(pokestop.quest){
+                table.row.add(pokestop)
+            }
+            if(pokestop.quest_ar){
+                table.row.add(pokestop)
+            }
         })
         table.draw()
 
