@@ -110,10 +110,11 @@ function updatePokestopMarker(pokestop, marker, isNotifPokestop) {
     }
     const iconWidth = hasQuest ? 55 : 32
     const iconHeight = hasQuest ? 48 : 32
+    const questOffset = hasQuest ? 8 : 0
     const icon = L.contentIcon({
         iconUrl: getPokestopIconUrlFiltered(pokestop),
         iconSize: [iconWidth * upscaleModifier, iconHeight * upscaleModifier],
-        iconAnchor: [(iconWidth / 2) * upscaleModifier, iconHeight * upscaleModifier],
+        iconAnchor: [(iconWidth / 2) * upscaleModifier, (iconHeight - questOffset) * upscaleModifier],
         popupAnchor: [0, (iconHeight / -2) * upscaleModifier]
     })
     marker.setIcon(icon)
