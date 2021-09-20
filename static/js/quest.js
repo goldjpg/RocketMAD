@@ -50,13 +50,13 @@ function loadQuests() {
                 return true
             }
             if (pokestop.quest) {
-                const newstop = pokestop
-                pokestop.quest_ar = null
+                const newstop = Object.assign({}, pokestop)
+                newstop.quest_ar = null
                 table.row.add(newstop)
             }
             if (pokestop.quest_ar) {
-                const newstop = pokestop
-                pokestop.quest = null
+                const newstop = Object.assign({}, pokestop)
+                newstop.quest = null
                 table.row.add(newstop)
             }
         })
