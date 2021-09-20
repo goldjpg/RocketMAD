@@ -46,7 +46,7 @@ function loadQuests() {
 
     loadRawData().done(function (result) {
         $.each(result.pokestops, function (id, pokestop) {
-            if (!pokestop.quest) {
+            if (!pokestop.quest && !pokestop.quest_ar) {
                 return true
             }
             if(pokestop.quest){
@@ -120,7 +120,11 @@ $(function () {
                 responsivePriority: 3,
                 data: null,
                 render: function (data, type, row) {
-                    return data.quest.task
+                    if (data.quest_ar) {
+                        return data.quest_ar.task
+                    } else {
+                        return data.quest.task
+                    }
                 }
             },
             {
@@ -129,7 +133,7 @@ $(function () {
                 type: 'natural',
                 data: null,
                 render: function (data, type, row) {
-                    const quest = data.quest
+                    const quest = data.quest_ar ? data.quest_ar : data.quest
                     if (type === 'display') {
                         let rewardImageUrl = ''
                         let rewardText = ''
@@ -192,6 +196,14 @@ $(function () {
                         case 12:
                             return `${quest.item_amount} ${getPokemonName(quest.pokemon_id)} ${getItemName(7)}`
                     }
+                }
+            },
+            {
+                targets: 3,
+                responsivePriority: 3,
+                data: null,
+                render: function (data, type, row) {
+                    return data.quest_ar ? i18n('Yes') : i18n('No')
                 }
             }
         ]

@@ -5,9 +5,9 @@ notifiedPokestopData, pokestopInvasionZIndex,
 pokestopLureZIndex, pokestopNotifiedZIndex, pokestopQuestZIndex,
 pokestopZIndex, removeMarker, removeRangeCircle, sendNotification, settings,
 setupRangeCircle, updateLabelDiffTime, updateRangeCircle, updateMarkerLayer,
-filterManagers
+filterManagers, updateMap
 */
-/* exported processPokestop */
+/* exported processPokestop, setQuestFormFilter */
 
 function isPokestopMeetsQuestFilters(quest) {
     if (!settings.showQuests || !quest) {
@@ -29,7 +29,8 @@ function isPokestopMeetsQuestFilters(quest) {
                 return !settings.excludedQuestItems.has(id)
             }
             case 7: {
-                return !settings.excludedQuestPokemon.has(quest.pokemon_id)
+                return !settings.excludedQuestPokemon.has(quest.pokemon_id) &&
+                (settings.questFormFilter === 'Any' || settings.questFormFilter === getFormName(quest.pokemon_id, quest.form_id))
             }
             case 12: {
                 const id = '7_' + quest.item_amount
@@ -94,7 +95,7 @@ function setupPokestopMarker(pokestop, isNotifPokestop) {
 
     marker.pokestop_id = pokestop.pokestop_id
     updatePokestopMarker(pokestop, marker, isNotifPokestop)
-    marker.bindPopup('', { autoPan: autoPanPopup() })
+    marker.bindPopup('', { autoPan: autoPanPopup(), maxHeight: 400 })
     addListeners(marker, 'pokestop')
 
     return marker
@@ -103,16 +104,14 @@ function setupPokestopMarker(pokestop, isNotifPokestop) {
 function updatePokestopMarker(pokestop, marker, isNotifPokestop) {
     const upscaleModifier = isNotifPokestop && settings.upscaleNotifMarkers ? 1.3 : 1
 
-    var hasQuest = false
-    if (isPokestopMeetsQuestFilters(pokestop.quest) || isPokestopMeetsQuestFilters(pokestop.quest_ar)) {
-        hasQuest = true
-    }
+    const hasQuest = (isPokestopMeetsQuestFilters(pokestop.quest) || isPokestopMeetsQuestFilters(pokestop.quest_ar)) && serverSettings.generateImages
     const iconWidth = hasQuest ? 55 : 32
     const iconHeight = hasQuest ? 48 : 32
+    const questOffset = hasQuest ? 8 : 0
     const icon = L.contentIcon({
         iconUrl: getPokestopIconUrlFiltered(pokestop),
         iconSize: [iconWidth * upscaleModifier, iconHeight * upscaleModifier],
-        iconAnchor: [(iconWidth / 2) * upscaleModifier, iconHeight * upscaleModifier],
+        iconAnchor: [(iconWidth / 2) * upscaleModifier, (iconHeight - questOffset) * upscaleModifier],
         popupAnchor: [0, (iconHeight / -2) * upscaleModifier]
     })
     marker.setIcon(icon)
@@ -432,7 +431,7 @@ function updatePokestop(id, pokestop = null) {
         const oldPokestop = mapData.pokestops[id]
         const newInvasion = !isInvadedPokestop(oldPokestop) && isInvadedPokestop(pokestop)
         const newLure = !isLuredPokestop(oldPokestop) && isLuredPokestop(pokestop)
-        const questChange = JSON.stringify(oldPokestop.quest) !== JSON.stringify(pokestop.quest)
+        const questChange = JSON.stringify(oldPokestop.quest) !== JSON.stringify(pokestop.quest) || JSON.stringify(oldPokestop.quest_ar) !== JSON.stringify(pokestop.quest_ar)
         if (newInvasion || newLure || questChange) {
             const { questNotif, invasionNotif, lureNotif, newNotif } = getPokestopNotificationInfo(pokestop)
             const isNotifPokestop = questNotif || invasionNotif || lureNotif
@@ -511,6 +510,12 @@ function removePokestop(pokestop) {
             luredPokestopIds.delete(id)
         }
     }
+}
+
+function setQuestFormFilter(name) {
+    settings.questFormFilter = name
+    updatePokestops()
+    updateMap({ loadAllPokestops: true })
 }
 
 function removePokestopMarker(id) { // eslint-disable-line no-unused-vars

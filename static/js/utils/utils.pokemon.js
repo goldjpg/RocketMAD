@@ -2,9 +2,9 @@
 exported genderClasses, getIvsPercentage, getIvsPercentageCssColor,
 getMoveName, getMoveType, getMoveTypeNoI8ln, getPokemonGen, getPokemonIds,
 getPokemonLevel, getPokemonNameWithForm, getPokemonRarity,
-getPokemonRarityName, getPokemonRawIconUrl, getPokemonTypes, initMoveData,
-initPokemonData, searchPokemon, createPokemonMarker, updatePokemonRarities,
-getLocationInCell, getLocationNearStop
+getPokemonRarityName, getLocationNearStop, getLocationInCell,
+getPokemonRawIconUrl, getPokemonTypes, initMoveData, initPokemonData,
+searchPokemon, createPokemonMarker, updatePokemonRarities
 */
 
 var pokemonData = {}
