@@ -107,7 +107,7 @@ function setupGymMarker(gym, isNotifGym) {
     marker.gym_id = gym.gym_id
     updateGymMarker(gym, marker, isNotifGym)
     if (!settings.useGymSidebar) {
-        marker.bindPopup('', { autoPan: autoPanPopup() })
+        marker.bindPopup('', { autoPan: autoPanPopup(), maxHeight: 400 })
     }
 
     if (settings.useGymSidebar) {
