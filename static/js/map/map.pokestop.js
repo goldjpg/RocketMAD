@@ -104,10 +104,7 @@ function setupPokestopMarker(pokestop, isNotifPokestop) {
 function updatePokestopMarker(pokestop, marker, isNotifPokestop) {
     const upscaleModifier = isNotifPokestop && settings.upscaleNotifMarkers ? 1.3 : 1
 
-    var hasQuest = false
-    if (isPokestopMeetsQuestFilters(pokestop.quest) || isPokestopMeetsQuestFilters(pokestop.quest_ar)) {
-        hasQuest = true
-    }
+    const hasQuest = (isPokestopMeetsQuestFilters(pokestop.quest) || isPokestopMeetsQuestFilters(pokestop.quest_ar)) && serverSettings.generateImages
     const iconWidth = hasQuest ? 55 : 32
     const iconHeight = hasQuest ? 48 : 32
     const questOffset = hasQuest ? 8 : 0
@@ -434,7 +431,7 @@ function updatePokestop(id, pokestop = null) {
         const oldPokestop = mapData.pokestops[id]
         const newInvasion = !isInvadedPokestop(oldPokestop) && isInvadedPokestop(pokestop)
         const newLure = !isLuredPokestop(oldPokestop) && isLuredPokestop(pokestop)
-        const questChange = JSON.stringify(oldPokestop.quest) !== JSON.stringify(pokestop.quest)
+        const questChange = JSON.stringify(oldPokestop.quest) !== JSON.stringify(pokestop.quest) || JSON.stringify(oldPokestop.quest_ar) !== JSON.stringify(pokestop.quest_ar)
         if (newInvasion || newLure || questChange) {
             const { questNotif, invasionNotif, lureNotif, newNotif } = getPokestopNotificationInfo(pokestop)
             const isNotifPokestop = questNotif || invasionNotif || lureNotif
