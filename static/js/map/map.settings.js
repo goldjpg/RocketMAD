@@ -18,6 +18,7 @@ function initSettings() {
     if (serverSettings.pokemons) {
         settings.pokemonIconSizeModifier = Store.get('pokemonIconSizeModifier')
         settings.showPokemonValues = serverSettings.pokemonValues && Store.get('showPokemonValues')
+        settings.showPokemonPvpValues = serverSettings.pokemonPVP && Store.get('showPokemonPvpValues')
         settings.pokemonIdNotifs = Store.get('pokemonIdNotifs')
         settings.notifPokemon = Store.get('notifPokemon')
         settings.showNotifPokemonOnly = Store.get('showNotifPokemonOnly')
@@ -44,6 +45,14 @@ function initSettings() {
         settings.maxNotifLevel = Store.get('maxNotifLevel')
         settings.tinyRattataNotifs = Store.get('tinyRattataNotifs')
         settings.bigMagikarpNotifs = Store.get('bigMagikarpNotifs')
+    }
+    if (serverSettings.pokemonPVP) {
+        settings.filterPokemonByPvpValues = Store.get('filterPokemonByPvpValues')
+        settings.noFilterPvpValuesPokemon = Store.get('noFilterPvpValuesPokemon')
+        settings.minSuper = Store.get('minSuper')
+        settings.maxSuper = Store.get('maxSuper')
+        settings.minUltra = Store.get('minUltra')
+        settings.maxUltra = Store.get('maxUltra')
     }
     settings.scaleByRarity = serverSettings.rarity && Store.get('scaleByRarity')
     if (serverSettings.rarity) {
@@ -189,6 +198,20 @@ function initSettingsSidebar() {
                 updatePokemons()
             }
             Store.set('showPokemon', this.checked)
+        })
+
+        $('#filter-pokemon-switch').on('change', function () {
+            settings.filterPokemonById = this.checked
+            const filterButton = $('a[data-target="pokemon-filter-modal"]')
+            if (this.checked) {
+                filterButton.show()
+                updatePokemons()
+            } else {
+                filterButton.hide()
+                reincludedPokemon = union(reincludedPokemon, settings.excludedPokemon)
+                updateMap()
+            }
+            Store.set('filterPokemonById', this.checked)
         })
 
         $('#filter-pokemon-switch').on('change', function () {
@@ -352,6 +375,111 @@ function initSettingsSidebar() {
 
             Store.set('minLevel', settings.minLevel)
             Store.set('maxLevel', settings.maxLevel)
+        })
+    }
+
+    if (serverSettings.pokemonPVP) {
+        $('#pokemon-pvp-switch').on('change', function () {
+            settings.showPokemonPvpValues = this.checked
+            const filterValuesWrapper = $('#filter-pokemon-pvp-wrapper')
+            if (this.checked) {
+                filterValuesWrapper.show()
+            } else {
+                filterValuesWrapper.hide()
+                if (settings.filterPokemonByPvpValues) {
+                    updateMap({ loadAllPokemon: true })
+                }
+            }
+            updatePokemons()
+            Store.set('showPokemonPvpValues', this.checked)
+        })
+
+        $('#filter-pvp-values-switch').on('change', function () {
+            settings.filterPokemonByPvpValues = this.checked
+            const filtersWrapper = $('#pokemon-pvp-filters-wrapper')
+            const filterButton = $('a[data-target="pokemon-pvp-filter-modal"]')
+            if (this.checked) {
+                filterButton.show()
+                filtersWrapper.show()
+                updatePokemons()
+            } else {
+                filterButton.hide()
+                filtersWrapper.hide()
+                updateMap({ loadAllPokemon: true })
+            }
+            Store.set('filterPokemonByPvpValues', this.checked)
+        })
+
+        var superSlider = document.getElementById('pokemon-superleague-slider')
+        noUiSlider.create(superSlider, {
+            start: [settings.minSuper, settings.maxSuper],
+            connect: true,
+            step: 1,
+            range: {
+                min: 0,
+                max: 100
+            },
+            format: {
+                to: function (value) {
+                    return Math.round(value)
+                },
+                from: function (value) {
+                    return Number(value)
+                }
+            }
+        })
+        superSlider.noUiSlider.on('change', function () {
+            const oldMinIvs = settings.minSuper
+            const oldMaxIvs = settings.maxSuper
+            settings.minSuper = this.get()[0]
+            settings.maxSuper = this.get()[1]
+
+            $('#pokemon-superleague-slider-title').text(`${i18n('Superleague')} (${settings.minSuper}% - ${settings.maxSuper}%)`)
+
+            if (settings.minSuper > oldMinIvs || settings.maxSuper < oldMaxIvs) {
+                updatePokemons(new Set(), true)
+            } else {
+                updateMap({ loadAllPokemon: true })
+            }
+
+            Store.set('minSuper', settings.minSuper)
+            Store.set('maxSuper', settings.maxSuper)
+        })
+
+        var ultraSlider = document.getElementById('pokemon-ultraleague-slider')
+        noUiSlider.create(ultraSlider, {
+            start: [settings.minUltra, settings.maxUltra],
+            connect: true,
+            step: 1,
+            range: {
+                min: 0,
+                max: 100
+            },
+            format: {
+                to: function (value) {
+                    return Math.round(value)
+                },
+                from: function (value) {
+                    return Number(value)
+                }
+            }
+        })
+        ultraSlider.noUiSlider.on('change', function () {
+            const oldMinIvs = settings.minUltra
+            const oldMaxIvs = settings.maxUltra
+            settings.minUltra = this.get()[0]
+            settings.maxUltra = this.get()[1]
+
+            $('#pokemon-ultraleague-slider-title').text(`${i18n('Ultraleague')} (${settings.minUltra}% - ${settings.maxUltra}%)`)
+
+            if (settings.minUltra > oldMinIvs || settings.maxUltra < oldMaxIvs) {
+                updatePokemons(new Set(), true)
+            } else {
+                updateMap({ loadAllPokemon: true })
+            }
+
+            Store.set('minUltra', settings.minUltra)
+            Store.set('maxUltra', settings.maxUltra)
         })
     }
 
@@ -1415,6 +1543,16 @@ function initSettingsSidebar() {
         $('#pokemon-level-slider-title').text(`${i18n('Levels')} (${settings.minLevel} - ${settings.maxLevel})`)
         $('#pokemon-level-slider-wrapper').toggle(settings.filterPokemonByValues)
     }
+    if (serverSettings.pokemonPVP) {
+        $('#pokemon-pvp-switch').prop('checked', settings.showPokemonPvpValues)
+        $('#filter-pokemon-pvp-wrapper').toggle(settings.showPokemonPvpValues)
+        $('#filter-pvp-values-switch').prop('checked', settings.filterPokemonByPvpValues)
+        $('a[data-target="pokemon-pvp-filter-modal"]').toggle(settings.filterPokemonByPvpValues)
+        $('#pokemon-values-filters-wrapper').toggle(settings.filterPokemonByValues)
+        $('#pokemon-superleague-slider-title').text(`${i18n('Superleague')} (${settings.minSuper}% - ${settings.maxSuper}%)`)
+        $('#pokemon-ultraleague-slider-title').text(`${i18n('Ultraleague')} (${settings.minUltra}% - ${settings.maxUltra}%)`)
+        $('#pokemon-pvp-filters-wrapper').toggle(settings.filterPokemonByPvpValues)
+    }
     if (serverSettings.rarity) {
         $('#rarity-select').val(settings.includedRarities)
         $('#rarity-notifs-select').val(settings.notifRarities)
@@ -1841,6 +1979,7 @@ const filterManagers = {
     excludedPokemon: null,
     notifPokemon: null,
     noFilterValuesPokemon: null,
+    noFilterPvpValuesPokemon: null,
     notifValuesPokemon: null,
     excludedRaidPokemon: null,
     notifRaidPokemon: null,
@@ -1934,6 +2073,19 @@ function initPokemonFilters() {
                 if (settings.showNotifPokemonOnly || settings.showNotifPokemonAlways) {
                     updateMap({ loadAllPokemon: true })
                 }
+            },
+            pokemonIds => updatePokemons(new Set(pokemonIds))
+        )
+    }
+
+    if (serverSettings.pokemonPVP) {
+        filterManagers.noFilterPvpValuesPokemon = new PokemonFilterManager(
+            'pokemon-pvp-filter-modal', 'noFilterPvpValuesPokemon', i18n('Pokémon filtered by pvp ranks'), true,
+            pokemonIds => {
+                for (const pokemonId of pokemonIds) {
+                    reincludedPokemon.add(pokemonId)
+                }
+                updateMap()
             },
             pokemonIds => updatePokemons(new Set(pokemonIds))
         )

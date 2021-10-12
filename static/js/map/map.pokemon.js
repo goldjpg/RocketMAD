@@ -54,6 +54,19 @@ function isPokemonMeetsFilters(pokemon, isNotifPokemon) {
         }
     }
 
+    if (settings.showPokemonPvpValues && settings.filterPokemonByPvpValues && !settings.noFilterPvpValuesPokemon.has(pokemon.pokemon_id)) {
+        if (pokemon.pvp != null) {
+            const superIV = Math.round(pokemon.pvp.great_rating)
+            const ultraIV = Math.round(pokemon.pvp.ultra_rating)
+            if (!((superIV >= settings.minSuper && superIV <= settings.maxSuper) || (ultraIV >= settings.minUltra && ultraIV <= settings.maxUltra))) {
+                return false
+            }
+        } else {
+            // Pokemon does not have pvp data
+            return false
+        }
+    }
+
     if (settings.excludeNearbyCells && pokemon.seen_type === 'nearby_cell') {
         return false
     }
@@ -166,6 +179,7 @@ function pokemonLabel(item) {
     var verifiedDisplay = ''
     var typesDisplay = ''
     var statsDisplay = ''
+    var pvpDisplay = ''
     var nearbyStopWarning = ''
 
     if (id === 29 || id === 32) {
@@ -251,6 +265,7 @@ function pokemonLabel(item) {
               ${catchRatesDisplay}
             </div>`
 
+
         let rarityDisplay = ''
         if (serverSettings.rarity) {
             const rarityName = getPokemonRarityName(item.pokemon_id)
@@ -277,6 +292,17 @@ function pokemonLabel(item) {
               ${rarityDisplay}<strong>Gen ${gen}</strong>
             </div>`
     }
+    if (item.pvp != null && settings.showPokemonPvpValues) {
+        pvpDisplay = `
+        <div class='info-container'>
+          <div>
+            ${i18n('Superleague')}:<br> <strong>${getPokemonName(item.pvp.great_id)} ${item.pvp.great_rating}% ${item.pvp.great_cp} ${i18n('CP')}</strong>
+          </div>
+          <div>
+            ${i18n('Ultraleague')}:<br> <strong>${getPokemonName(item.pvp.ultra_id)} ${item.pvp.ultra_rating}% ${item.pvp.ultra_cp} ${i18n('CP')}</strong>
+          </div>
+        </div>`
+    }
 
     const notifText = settings.notifPokemon.has(id) ? i18n('Don\'t notify') : i18n('Notify')
     const notifIconClass = settings.notifPokemon.has(id) ? 'fas fa-bell-slash' : 'fas fa-bell'
@@ -301,6 +327,7 @@ function pokemonLabel(item) {
                 ${timestampToTime(disappearTime)} (<span class='label-countdown' disappears-at='${disappearTime}'>00m00s</span>) ${verifiedDisplay}
               </div>
               ${statsDisplay}
+              ${pvpDisplay}
               ${genRarityDisplayRight}
               <div class='coordinates'>
                 ${nearbyStopWarning}

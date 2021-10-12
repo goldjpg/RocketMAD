@@ -220,6 +220,8 @@ def create_app():
                 if user_args.upscaled_pokemon is not None else []),
             'pokemonValues': (not user_args.no_pokemon
                               and not user_args.no_pokemon_values),
+            'pokemonPVP': (not user_args.no_pokemon
+                              and user_args.pvp_values),
             'catchRates': user_args.catch_rates,
             'rarity': (not user_args.no_pokemon and user_args.rarity
                        and user_args.rarity_update_frequency),

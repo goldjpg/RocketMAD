@@ -220,6 +220,28 @@
     </div>
     {% endif %}
 
+    {% if settings.pokemonPVP %}
+    <div id="pokemon-pvp-filter-modal" class="modal filter-modal pokemon-filter-modal">
+      <div class="modal-content">
+        <h6 class="pokemon-filter-title">{{ i18n('Pokémon filtered by pvp ranks') }}</h6>
+        <label for="unfiltered-pokemon">
+          <input id="unfiltered-pokemon" type="text" readonly="true" style="display:none;">
+          <div class="pokemon-filter-list"></div>
+          <div class="filter-footer-container">
+            <div class="filter-footer-left">
+              <a class="btn-flat tooltipped search-info-btn" data-html="true" data-position="top" data-tooltip="{{ i18n('You can search for: Name, ID, Type and Generation. Multiple search terms can be used by separating them with commas. Exclusion is possible by prepending \'-\' to a search term.') }}"><i class="material-icons">info_outline</i></a>
+              <input type="search" class="search" placeholder="{{ i18n('Search...') }}">
+            </div>
+            <div class="filter-footer-right">
+              <a class="waves-effect btn-flat filter-select-all"><i class="material-icons" title="{{ i18n('Select all') }}">select_all</i></a>
+              <a class="waves-effect btn-flat filter-deselect-all"><i class="material-icons" title="{{ i18n('Deselect all') }}">delete_forever</i></a>
+            </div>
+          </div>
+        </label>
+      </div>
+    </div>
+    {% endif %}
+
     {% if settings.raidFilters %}
     <div id="raid-pokemon-filter-modal" class="modal filter-modal pokemon-filter-modal">
       <div class="modal-content">
@@ -659,6 +681,45 @@
                     <span id="pokemon-level-slider-title" class="slider-title">Levels</span>
                     <div class="slider-container">
                       <div id="pokemon-level-slider"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            {% if settings.pokemonPVP %}
+            <div class="settings-container">
+              <div class="form-control">
+                <div class="switch">
+                  <label>
+                    <input type="checkbox" id="pokemon-pvp-switch">
+                    <span class="lever"></span>
+                    {{ i18n('PVP data') }}
+                  </label>
+                </div>
+              </div>
+              <div id="filter-pokemon-pvp-wrapper">
+                <div class="form-control">
+                  <div class="switch">
+                    <label>
+                      <input type="checkbox" id="filter-pvp-values-switch">
+                      <span class="lever"></span>
+                      {{ i18n('Filter by pvp ranks') }}
+                    </label>
+                    <a data-target="pokemon-pvp-filter-modal" class="waves-effect btn-flat modal-trigger filter-button" title="{{ i18n('Select Pokémon') }}"><i class="material-icons left">filter_list</i></a>
+                  </div>
+                </div>
+                <div id="pokemon-pvp-filters-wrapper">
+                  <div class="form-control">
+                    <span id="pokemon-superleague-slider-title" class="slider-title">Superleague</span>
+                    <div class="slider-container">
+                      <div id="pokemon-superleague-slider"></div>
+                    </div>
+                  </div>
+                  <div class="form-control">
+                    <span id="pokemon-ultraleague-slider-title" class="slider-title">Ultraleague</span>
+                    <div class="slider-container">
+                      <div id="pokemon-ultraleague-slider"></div>
                     </div>
                   </div>
                 </div>

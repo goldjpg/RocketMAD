@@ -107,6 +107,34 @@ const StoreOptions = {
         default: 35,
         type: StoreTypes.Number
     },
+    showPokemonPvpValues: {
+        default: false,
+        type: StoreTypes.Boolean
+    },
+    filterPokemonByPvpValues: {
+        default: false,
+        type: StoreTypes.Boolean
+    },
+    noFilterPvpValuesPokemon: {
+        default: new Set(),
+        type: StoreTypes.Set
+    },
+    minSuper: {
+        default: 0,
+        type: StoreTypes.Number
+    },
+    maxSuper: {
+        default: 100,
+        type: StoreTypes.Number
+    },
+    minUltra: {
+        default: 0,
+        type: StoreTypes.Number
+    },
+    maxUltra: {
+        default: 100,
+        type: StoreTypes.Number
+    },
     includedRarities: {
         default: [1, 2, 3, 4, 5, 6], // Common ... New Spawn
         type: StoreTypes.JSON
