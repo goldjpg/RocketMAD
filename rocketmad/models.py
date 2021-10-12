@@ -13,6 +13,7 @@ from sqlalchemy.orm import Load, load_only, aliased
 from sqlalchemy.sql.expression import and_, or_
 from timeit import default_timer
 
+from .auth.PvpUtils import get_pvp_info
 from .utils import get_args
 
 log = logging.getLogger(__name__)
@@ -68,7 +69,7 @@ class Pokemon(db.Model):
     def get_active(swLat, swLng, neLat, neLng, oSwLat=None, oSwLng=None,
                    oNeLat=None, oNeLng=None, timestamp=0, eids=None, ids=None,
                    geofences=None, exclude_geofences=None,
-                   verified_despawn_time=False, exclude_nearby_cells=True):
+                   verified_despawn_time=False, exclude_nearby_cells=True, include_pvp=False):
         columns = [
             Pokemon.encounter_id, Pokemon.pokemon_id, Pokemon.latitude,
             Pokemon.longitude, Pokemon.disappear_time,
@@ -135,8 +136,26 @@ class Pokemon(db.Model):
             query = query.filter(Pokemon.pokemon_id.notin_(eids))
         elif ids:
             query = query.filter(Pokemon.pokemon_id.in_(ids))
+        pokelist = [pokemon._asdict() for pokemon in query.all()]
+        for pokemon in pokelist:
+            if include_pvp and pokemon.get("individual_attack") is not None:
+                values = get_pvp_info(pokemon["pokemon_id"], pokemon["individual_attack"],
+                                      pokemon["individual_defense"], pokemon["individual_stamina"],
+                                      pokemon["cp_multiplier"])
+                pokemon["pvp"] = {
+                    "great_rating": values[0],
+                    "great_id": values[1],
+                    "great_cp": values[2],
+                    "great_level": values[3],
+                    "ultra_rating": values[4],
+                    "ultra_id": values[5],
+                    "ultra_cp": values[6],
+                    "ultra_level": values[7]
+                }
+            else:
+                pokemon["pvp"] = None
 
-        return [pokemon._asdict() for pokemon in query.all()]
+        return pokelist
 
     # Get all Pokémon spawn counts based on the last x hours.
     # More efficient than get_seen(): we don't do any unnecessary mojo.
@@ -719,8 +738,7 @@ class Pokestop(db.Model):
             sql = geofences_to_query(exclude_geofences, 'pokestop')
             query = query.filter(~text(sql))
 
-
-        #log.info(query.statement.compile(compile_kwargs={"literal_binds": True}))
+        # log.info(query.statement.compile(compile_kwargs={"literal_binds": True}))
         result = query.all()
 
         now = datetime.utcnow()
@@ -730,7 +748,7 @@ class Pokestop(db.Model):
             quest_orm = r[1] if quests else None
             quest_orm2 = None
             if quests:
-                if(len(r) > 2):
+                if (len(r) > 2):
                     quest_orm2 = r[2]
             pokestop = orm_to_dict(pokestop_orm)
             pokestop['quest'] = None
@@ -767,9 +785,9 @@ class Pokestop(db.Model):
                     'stardust': quest_orm2.quest_stardust
                 }
 
-            #if quest_orm is not None and quest_orm2 is not None:
-                #log.info(orm_to_dict(quest_orm))
-                #log.info(orm_to_dict(quest_orm2))
+            # if quest_orm is not None and quest_orm2 is not None:
+            # log.info(orm_to_dict(quest_orm))
+            # log.info(orm_to_dict(quest_orm2))
 
             if (pokestop['incident_expiration'] is not None
                 and (pokestop['incident_expiration'] < now

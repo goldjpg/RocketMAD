@@ -800,6 +800,7 @@ def create_app():
 
         if pokemon:
             verified_despawn = user_args.verified_despawn_time
+            include_pvp = user_args.pvp_values
             eids = None
             ids = None
             if (request.args.get('eids')
@@ -819,7 +820,7 @@ def create_app():
                         geofences=geofences,
                         exclude_geofences=exclude_geofences,
                         verified_despawn_time=verified_despawn,
-                        exclude_nearby_cells=exclude_nearby_cells))
+                        exclude_nearby_cells=exclude_nearby_cells, include_pvp=include_pvp))
             else:
                 # If map is already populated only request modified Pokemon
                 # since last request time.
@@ -829,7 +830,7 @@ def create_app():
                         eids=eids, ids=ids, geofences=geofences,
                         exclude_geofences=exclude_geofences,
                         verified_despawn_time=verified_despawn,
-                        exclude_nearby_cells=exclude_nearby_cells))
+                        exclude_nearby_cells=exclude_nearby_cells, include_pvp=include_pvp))
 
                 if new_area:
                     # If screen is moved add newly uncovered Pokemon to the
@@ -842,7 +843,7 @@ def create_app():
                                 eids=eids, ids=ids, geofences=geofences,
                                 exclude_geofences=exclude_geofences,
                                 verified_despawn_time=verified_despawn,
-                                exclude_nearby_cells=exclude_nearby_cells)))
+                                exclude_nearby_cells=exclude_nearby_cells, include_pvp=include_pvp)))
 
             if request.args.get('reids'):
                 request_reids = request.args.get('reids').split(',')
@@ -852,7 +853,7 @@ def create_app():
                                        geofences=geofences,
                                        exclude_geofences=exclude_geofences,
                                        verified_despawn_time=verified_despawn,
-                                       exclude_nearby_cells=exclude_nearby_cells))
+                                       exclude_nearby_cells=exclude_nearby_cells, include_pvp=include_pvp))
                 d['reids'] = reids
 
         if seen:

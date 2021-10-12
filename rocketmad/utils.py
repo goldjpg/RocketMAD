@@ -121,6 +121,9 @@ def get_args(access_config=None):
     parser.add_argument('-npv', '--no-pokemon-values',
                         help='Disables pokemon values.',
                         action='store_true', default=False)
+    parser.add_argument('-pvp', '--pvp-values',
+                        help='Enables pokemon pvp values.',
+                        action='store_true', default=False)
     parser.add_argument('-cr', '--catch-rates',
                         action='store_true',
                         help='Show catch rates for all three balls.')
@@ -631,6 +634,7 @@ def get_args(access_config=None):
             'no_geocoder',
             'no_pokemon',
             'no_pokemon_values',
+            'pvp_values',
             'catch_rates',
             'rarity',
             'upscaled_pokemon',
