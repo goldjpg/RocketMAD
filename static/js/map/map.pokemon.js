@@ -35,28 +35,21 @@ function isPokemonMeetsFilters(pokemon, isNotifPokemon) {
     }
     var passesIV = true
     if (settings.showPokemonValues && settings.filterPokemonByValues && !settings.noFilterValuesPokemon.has(pokemon.pokemon_id)) {
+        passesIV = false
         if (pokemon.individual_attack != null) {
             const ivsPercentage = getIvsPercentage(pokemon.individual_attack, pokemon.individual_defense, pokemon.individual_stamina)
-            if (ivsPercentage < settings.minIvs && !(settings.showZeroIvsPokemon && ivsPercentage === 0)) {
-                passesIV = false
+            if ((ivsPercentage >= settings.minIvs || (settings.showZeroIvsPokemon && ivsPercentage === 0)) && (ivsPercentage <= settings.maxIvs || (settings.showHundoIvsPokemon && ivsPercentage === 100))) {
+                const level = getPokemonLevel(pokemon.cp_multiplier)
+                if (level >= settings.minLevel && level <= settings.maxLevel) {
+                    passesIV = true
+                }
             }
-            if (ivsPercentage > settings.maxIvs && !(settings.showHundoIvsPokemon && ivsPercentage === 100)) {
-                passesIV = false
-            }
-
-            const level = getPokemonLevel(pokemon.cp_multiplier)
-            if (level < settings.minLevel || level > settings.maxLevel) {
-                passesIV = false
-            }
-        } else {
-            // Pokemon is not encountered.
-            passesIV = false
         }
     }
     var passesPVP = true
     if (settings.showPokemonPvpValues && settings.filterPokemonByPvpValues && !settings.noFilterPvpValuesPokemon.has(pokemon.pokemon_id)) {
+        passesPVP = false
         if (pokemon.pvp != null) {
-            passesPVP = false
             pokemon.pvp.great.forEach((data) => {
                 if (data.rank >= settings.minSuper && data.rank <= settings.maxSuper) {
                     passesPVP = true
@@ -67,9 +60,6 @@ function isPokemonMeetsFilters(pokemon, isNotifPokemon) {
                     passesPVP = true
                 }
             })
-        } else {
-            // Pokemon does not have pvp data
-            passesPVP = false
         }
     }
     // Display the pokemon if it passes pvp filters OR iv filters
