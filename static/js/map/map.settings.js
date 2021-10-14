@@ -250,10 +250,8 @@ function initSettingsSidebar() {
                 filterValuesWrapper.show()
             } else {
                 filterValuesWrapper.hide()
-                if (settings.filterPokemonByValues) {
-                    updateMap({ loadAllPokemon: true })
-                }
             }
+            updateMap({ loadAllPokemon: true })
             updatePokemons()
             Store.set('showPokemonValues', this.checked)
         })
@@ -265,12 +263,11 @@ function initSettingsSidebar() {
             if (this.checked) {
                 filterButton.show()
                 filtersWrapper.show()
-                updatePokemons()
             } else {
                 filterButton.hide()
                 filtersWrapper.hide()
-                updateMap({ loadAllPokemon: true })
             }
+            updateMap({ loadAllPokemon: true })
             Store.set('filterPokemonByValues', this.checked)
         })
 
@@ -386,11 +383,8 @@ function initSettingsSidebar() {
                 filterValuesWrapper.show()
             } else {
                 filterValuesWrapper.hide()
-                if (settings.filterPokemonByPvpValues) {
-                    updateMap({ loadAllPokemon: true })
-                }
             }
-            updatePokemons()
+            updateMap({ loadAllPokemon: true })
             Store.set('showPokemonPvpValues', this.checked)
         })
 
@@ -401,12 +395,11 @@ function initSettingsSidebar() {
             if (this.checked) {
                 filterButton.show()
                 filtersWrapper.show()
-                updatePokemons()
             } else {
                 filterButton.hide()
                 filtersWrapper.hide()
-                updateMap({ loadAllPokemon: true })
             }
+            updateMap({ loadAllPokemon: true })
             Store.set('filterPokemonByPvpValues', this.checked)
         })
 
