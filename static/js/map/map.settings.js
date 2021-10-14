@@ -1549,8 +1549,8 @@ function initSettingsSidebar() {
         $('#filter-pvp-values-switch').prop('checked', settings.filterPokemonByPvpValues)
         $('a[data-target="pokemon-pvp-filter-modal"]').toggle(settings.filterPokemonByPvpValues)
         $('#pokemon-values-filters-wrapper').toggle(settings.filterPokemonByValues)
-        $('#pokemon-superleague-slider-title').text(`${i18n('Great league')} (${settings.minSuper}% - ${settings.maxSuper}%)`)
-        $('#pokemon-ultraleague-slider-title').text(`${i18n('Ultra league')} (${settings.minUltra}% - ${settings.maxUltra}%)`)
+        $('#pokemon-superleague-slider-title').text(`${i18n('Great league')} (${settings.minSuper}# - ${settings.maxSuper}#)`)
+        $('#pokemon-ultraleague-slider-title').text(`${i18n('Ultra league')} (${settings.minUltra}# - ${settings.maxUltra}#)`)
         $('#pokemon-pvp-filters-wrapper').toggle(settings.filterPokemonByPvpValues)
     }
     if (serverSettings.rarity) {

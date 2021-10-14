@@ -51,7 +51,6 @@ def get_pvp_info(monster_id, form, atk, de, sta, cp_modifier, gender):
         if data.is_changed():
             pickle_data(data)
             data.saved()
-        log.info(str(monster_id) +", "+ str(form) +", "+ str(atk) +", "+ str(de)+", "+ str(sta)+", "+ str(calc_pokemon_level(cp_modifier))+", "+ str(gender))
         return data.getPoraclePvpInfo(monster_id, form, atk, de, sta, calc_pokemon_level(cp_modifier), gender)
     else:
         return None, None
