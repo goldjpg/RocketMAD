@@ -33,38 +33,48 @@ function isPokemonMeetsFilters(pokemon, isNotifPokemon) {
             (settings.pokemonNotifs && settings.showNotifPokemonOnly && !isNotifPokemon)) {
         return false
     }
-
+    var passesIV = true
     if (settings.showPokemonValues && settings.filterPokemonByValues && !settings.noFilterValuesPokemon.has(pokemon.pokemon_id)) {
         if (pokemon.individual_attack != null) {
             const ivsPercentage = getIvsPercentage(pokemon.individual_attack, pokemon.individual_defense, pokemon.individual_stamina)
             if (ivsPercentage < settings.minIvs && !(settings.showZeroIvsPokemon && ivsPercentage === 0)) {
-                return false
+                passesIV = false
             }
             if (ivsPercentage > settings.maxIvs && !(settings.showHundoIvsPokemon && ivsPercentage === 100)) {
-                return false
+                passesIV = false
             }
 
             const level = getPokemonLevel(pokemon.cp_multiplier)
             if (level < settings.minLevel || level > settings.maxLevel) {
-                return false
+                passesIV = false
             }
         } else {
             // Pokemon is not encountered.
-            return false
+            passesIV = false
         }
     }
-
+    var passesPVP = true
     if (settings.showPokemonPvpValues && settings.filterPokemonByPvpValues && !settings.noFilterPvpValuesPokemon.has(pokemon.pokemon_id)) {
         if (pokemon.pvp != null) {
-            const superIV = Math.round(pokemon.pvp.great_rating)
-            const ultraIV = Math.round(pokemon.pvp.ultra_rating)
-            if (!((superIV >= settings.minSuper && superIV <= settings.maxSuper) || (ultraIV >= settings.minUltra && ultraIV <= settings.maxUltra))) {
-                return false
-            }
+            passesPVP = false
+            pokemon.pvp.great.forEach((data) => {
+                if (data.rank >= settings.minSuper && data.rank <= settings.maxSuper) {
+                    passesPVP = true
+                }
+            })
+            pokemon.pvp.ultra.forEach((data) => {
+                if (data.rank >= settings.minUltra && data.rank <= settings.maxUltra) {
+                    passesPVP = true
+                }
+            })
         } else {
             // Pokemon does not have pvp data
-            return false
+            passesPVP = false
         }
+    }
+    // Display the pokemon if it passes pvp filters OR iv filters
+    if (!(passesIV || passesPVP)) {
+        return false
     }
 
     if (settings.excludeNearbyCells && pokemon.seen_type === 'nearby_cell') {
@@ -293,14 +303,28 @@ function pokemonLabel(item) {
             </div>`
     }
     if (item.pvp != null && settings.showPokemonPvpValues) {
+        var superDisplay = ''
+        var ultraDisplay = ''
+        if (item.pvp.great.length > 0) {
+            superDisplay = `<div>${i18n('Great league')}:`
+            item.pvp.great.forEach((data) => {
+                superDisplay += `<br> <strong>${getPokemonName(data.pokemon)} #${data.rank}(${data.percentage}%) ${data.cp} ${i18n('CP')}</strong>`
+            })
+            superDisplay += '</div>'
+        }
+
+        if (item.pvp.ultra.length > 0) {
+            ultraDisplay = `<div>${i18n('Ultra league')}:`
+            item.pvp.ultra.forEach((data) => {
+                ultraDisplay += `<br> <strong>${getPokemonName(data.pokemon)} #${data.rank}(${data.percentage}%) ${data.cp} ${i18n('CP')}</strong>`
+            })
+            ultraDisplay += '</div>'
+        }
+
         pvpDisplay = `
         <div class='info-container'>
-          <div>
-            ${i18n('Superleague')}:<br> <strong>${getPokemonName(item.pvp.great_id)} ${item.pvp.great_rating}% ${item.pvp.great_cp} ${i18n('CP')}</strong>
-          </div>
-          <div>
-            ${i18n('Ultraleague')}:<br> <strong>${getPokemonName(item.pvp.ultra_id)} ${item.pvp.ultra_rating}% ${item.pvp.ultra_cp} ${i18n('CP')}</strong>
-          </div>
+            ${superDisplay}
+            ${ultraDisplay}
         </div>`
     }
 

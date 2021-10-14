@@ -434,7 +434,7 @@ function initSettingsSidebar() {
             settings.minSuper = this.get()[0]
             settings.maxSuper = this.get()[1]
 
-            $('#pokemon-superleague-slider-title').text(`${i18n('Superleague')} (${settings.minSuper}% - ${settings.maxSuper}%)`)
+            $('#pokemon-superleague-slider-title').text(`${i18n('Great league')} (${settings.minSuper}# - ${settings.maxSuper}#)`)
 
             if (settings.minSuper > oldMinIvs || settings.maxSuper < oldMaxIvs) {
                 updatePokemons(new Set(), true)
@@ -470,7 +470,7 @@ function initSettingsSidebar() {
             settings.minUltra = this.get()[0]
             settings.maxUltra = this.get()[1]
 
-            $('#pokemon-ultraleague-slider-title').text(`${i18n('Ultraleague')} (${settings.minUltra}% - ${settings.maxUltra}%)`)
+            $('#pokemon-ultraleague-slider-title').text(`${i18n('Ultra league')} (${settings.minUltra}# - ${settings.maxUltra}#)`)
 
             if (settings.minUltra > oldMinIvs || settings.maxUltra < oldMaxIvs) {
                 updatePokemons(new Set(), true)
@@ -1549,8 +1549,8 @@ function initSettingsSidebar() {
         $('#filter-pvp-values-switch').prop('checked', settings.filterPokemonByPvpValues)
         $('a[data-target="pokemon-pvp-filter-modal"]').toggle(settings.filterPokemonByPvpValues)
         $('#pokemon-values-filters-wrapper').toggle(settings.filterPokemonByValues)
-        $('#pokemon-superleague-slider-title').text(`${i18n('Superleague')} (${settings.minSuper}% - ${settings.maxSuper}%)`)
-        $('#pokemon-ultraleague-slider-title').text(`${i18n('Ultraleague')} (${settings.minUltra}% - ${settings.maxUltra}%)`)
+        $('#pokemon-superleague-slider-title').text(`${i18n('Great league')} (${settings.minSuper}% - ${settings.maxSuper}%)`)
+        $('#pokemon-ultraleague-slider-title').text(`${i18n('Ultra league')} (${settings.minUltra}% - ${settings.maxUltra}%)`)
         $('#pokemon-pvp-filters-wrapper').toggle(settings.filterPokemonByPvpValues)
     }
     if (serverSettings.rarity) {

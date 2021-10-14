@@ -139,19 +139,17 @@ class Pokemon(db.Model):
         pokelist = [pokemon._asdict() for pokemon in query.all()]
         for pokemon in pokelist:
             if include_pvp and pokemon.get("individual_attack") is not None:
-                values = get_pvp_info(pokemon["pokemon_id"], pokemon["individual_attack"],
-                                      pokemon["individual_defense"], pokemon["individual_stamina"],
-                                      pokemon["cp_multiplier"])
-                pokemon["pvp"] = {
-                    "great_rating": values[0],
-                    "great_id": values[1],
-                    "great_cp": values[2],
-                    "great_level": values[3],
-                    "ultra_rating": values[4],
-                    "ultra_id": values[5],
-                    "ultra_cp": values[6],
-                    "ultra_level": values[7]
-                }
+                great, ultra = get_pvp_info(pokemon["pokemon_id"], pokemon.get("form", 0), pokemon["individual_attack"],
+                                        pokemon["individual_defense"], pokemon["individual_stamina"],
+                                        pokemon["cp_multiplier"], pokemon["gender"])
+                if len(great) == 0:
+                    great = None
+                if len(ultra) == 0:
+                    ultra = None
+                if great is None or ultra is None:
+                    pokemon["pvp"] = None
+                else:
+                    pokemon["pvp"] = {"great": great, "ultra": ultra}
             else:
                 pokemon["pvp"] = None
 

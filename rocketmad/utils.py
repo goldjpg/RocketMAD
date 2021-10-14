@@ -448,6 +448,9 @@ def get_args(access_config=None):
                         help=('Use ImageMagick to generate dynamic '
                               'icons on demand.'),
                         action='store_true', default=False)
+    parser.add_argument('-prepvp', '--pregenerate-pvp',
+                        help=('Pregenerate PVP rank data before the map launches.'),
+                        action='store_true', default=False)
     parser.add_argument('-pa', '--pogo-assets', default=None,
                         help=('Directory pointing to optional '
                               'PogoAssets root directory.'))

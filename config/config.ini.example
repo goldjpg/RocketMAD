@@ -10,6 +10,7 @@
 #location:                      # Location, can be an address or coordinates.
 #pogo-assets:                   # Directory pointing to optional PogoAssets root directory. (default=None)
 #generate-images                # Use ImageMagick to generate dynamic icons on demand. (This is required for quest pokestops on the map)
+#pregenerate-pvp                # Pregenerate PVP rank data before the map launches. (Recommended)
 
 
 # Front end settings

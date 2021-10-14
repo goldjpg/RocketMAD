@@ -17,6 +17,7 @@ from flask_session import Session
 from functools import wraps
 from s2sphere import LatLng
 
+from .auth.PvpUtils import load_data
 from .auth.auth_factory import AuthFactory
 from .blacklist import fingerprints
 from .dyn_img import ImageGenerator
@@ -139,6 +140,7 @@ def create_app():
     app.config['SQLALCHEMY_POOL_RECYCLE'] = args.db_pool_recycle
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
+    load_data(args.pregenerate_pvp)
 
     if args.client_auth:
         app.config['SESSION_TYPE'] = 'redis'
