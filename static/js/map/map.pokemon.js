@@ -69,7 +69,20 @@ function isPokemonMeetsFilters(pokemon, isNotifPokemon) {
             })
         }
     }
-    if (!(passIV || passPVP) && ((settings.showPokemonPvpValues && settings.filterPokemonByPvpValues) || (settings.showPokemonValues && settings.filterPokemonByValues))) {
+    const pvpfilteringEnabled = (settings.showPokemonPvpValues && settings.filterPokemonByPvpValues)
+    const ivfilteringEnabled = (settings.showPokemonValues && settings.filterPokemonByValues)
+    if (!ivfilteringEnabled && pvpfilteringEnabled && !passPVP && settings.noFilterPvpValuesPokemon.has(pokemon.pokemon_id)) {
+        passPVP = true
+    }
+    if (!pvpfilteringEnabled && ivfilteringEnabled && !passIV && settings.noFilterValuesPokemon.has(pokemon.pokemon_id)) {
+        passIV = true
+    }
+    if (settings.noFilterValuesPokemon.has(pokemon.pokemon_id) && settings.noFilterPvpValuesPokemon.has(pokemon.pokemon_id)) {
+        passIV = true
+        passPVP = true
+    }
+
+    if (!(passIV || (passPVP)) && (pvpfilteringEnabled || ivfilteringEnabled)) {
         return false
     }
 

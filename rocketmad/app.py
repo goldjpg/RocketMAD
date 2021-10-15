@@ -804,7 +804,7 @@ def create_app():
 
         if pokemon:
             verified_despawn = user_args.verified_despawn_time
-            include_pvp = user_args.pvp_values
+            include_pvp = user_args.pvp_values and request.args.get('pvp') == 'true'
             eids = None
             ids = None
             if (request.args.get('eids')
