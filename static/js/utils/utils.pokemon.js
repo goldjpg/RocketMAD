@@ -253,7 +253,7 @@ function createPokemonMarker(pokemon, generateImages, glowing) {
         })
     }
     if (glowing) {
-        if (getIvsPercentage(pokemon) === 100) {
+        if (getIvsPercentage(pokemon.individual_attack, pokemon.individual_defense, pokemon.individual_stamina) === 100) {
             html += 'filter:drop-shadow(0 0 10px red)drop-shadow(0 0 10px red);-webkit-filter:drop-shadow(0 0 10px red)drop-shadow(0 0 10px red);'
         } else if (perfectPVP) {
             html += 'filter:drop-shadow(0 0 10px blue)drop-shadow(0 0 10px blue);-webkit-filter:drop-shadow(0 0 10px blue)drop-shadow(0 0 10px blue);'
