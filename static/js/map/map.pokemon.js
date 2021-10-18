@@ -401,7 +401,7 @@ function processPokemon(pokemon) {
             sendPokemonNotification(pokemon)
         }
 
-        pokemon.marker = createPokemonMarker(pokemon, serverSettings.generateImages)
+        pokemon.marker = createPokemonMarker(pokemon, serverSettings.generateImages, serverSettings.pokemonGlowing)
         customizePokemonMarker(pokemon, pokemon.marker, isNotifPoke)
 
         if (isPokemonRangesActive()) {
