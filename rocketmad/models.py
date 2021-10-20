@@ -13,7 +13,7 @@ from sqlalchemy.orm import Load, load_only, aliased
 from sqlalchemy.sql.expression import and_, or_
 from timeit import default_timer
 
-from .auth.PvpUtils import get_pvp_info
+from rocketmad.PvpUtils import get_pvp_info
 from .utils import get_args
 
 log = logging.getLogger(__name__)

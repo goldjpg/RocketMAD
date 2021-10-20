@@ -17,7 +17,7 @@ from flask_session import Session
 from functools import wraps
 from s2sphere import LatLng
 
-from .auth.PvpUtils import load_data
+from rocketmad.PvpUtils import load_data
 from .auth.auth_factory import AuthFactory
 from .blacklist import fingerprints
 from .dyn_img import ImageGenerator
