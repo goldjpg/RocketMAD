@@ -10,6 +10,7 @@
 #location:                      # Location, can be an address or coordinates.
 #pogo-assets:                   # Directory pointing to optional PogoAssets root directory. (default=None)
 #generate-images                # Use ImageMagick to generate dynamic icons on demand. (This is required for quest pokestops on the map)
+#pregenerate-pvp                # Pregenerate PVP rank data before the map launches. (Recommended)
 
 
 # Front end settings
@@ -40,6 +41,8 @@
 
 #no-pokemon                     # Disables pokemon. (default=False)
 #no-pokemon-values              # Disables pokemon values. (ivs, cp, moves, etc.) (default=False)
+#no-pokemon-glowing             # Disables the glowing of pokemon with 100% IV or 1# pvp rank. (default=False)
+#pvp-values                     # Enables pvp iv calculation. (default=False)
 #catch-rates                    # Show catch rates for all three balls. (default=False)
 #upscaled-pokemon:              # Pokémon IDs to upscale icons for. Seperate IDs with commas. (default=None)
 #no-pokemon-history-page        # Disables pokemon history page. (default=False)

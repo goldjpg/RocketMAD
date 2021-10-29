@@ -783,6 +783,7 @@ function loadRawData() {
     const loadScannedLocs = settings.showScannedLocations
     const loadNests = settings.showNests
     const loadExcludeNearbyCells = settings.excludeNearbyCells
+    const loadpvpdata = settings.showPokemonPvpValues
 
     const bounds = map.getBounds()
     const swPoint = bounds.getSouthWest()
@@ -827,7 +828,8 @@ function loadRawData() {
             allSpawnpoints: getAllSpawnpoints,
             allScannedLocs: getAllScannedLocs,
             allNests: getAllNests,
-            excludeNearbyCells: loadExcludeNearbyCells
+            excludeNearbyCells: loadExcludeNearbyCells,
+            pvp: loadpvpdata
         },
         dataType: 'json',
         cache: false,

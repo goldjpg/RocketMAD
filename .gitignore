@@ -5,6 +5,7 @@
 *.sass-cache
 *.orig
 *.json
+*.pickle
 config/*
 !config/*.example
 geofences/*

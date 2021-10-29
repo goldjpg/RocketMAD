@@ -33,25 +33,57 @@ function isPokemonMeetsFilters(pokemon, isNotifPokemon) {
             (settings.pokemonNotifs && settings.showNotifPokemonOnly && !isNotifPokemon)) {
         return false
     }
-
+    var passIV = false
     if (settings.showPokemonValues && settings.filterPokemonByValues && !settings.noFilterValuesPokemon.has(pokemon.pokemon_id)) {
+        passIV = true
         if (pokemon.individual_attack != null) {
             const ivsPercentage = getIvsPercentage(pokemon.individual_attack, pokemon.individual_defense, pokemon.individual_stamina)
             if (ivsPercentage < settings.minIvs && !(settings.showZeroIvsPokemon && ivsPercentage === 0)) {
-                return false
+                passIV = false
             }
             if (ivsPercentage > settings.maxIvs && !(settings.showHundoIvsPokemon && ivsPercentage === 100)) {
-                return false
+                passIV = false
             }
 
             const level = getPokemonLevel(pokemon.cp_multiplier)
             if (level < settings.minLevel || level > settings.maxLevel) {
-                return false
+                passIV = false
             }
         } else {
             // Pokemon is not encountered.
-            return false
+            passIV = false
         }
+    }
+    var passPVP = false
+    if (settings.showPokemonPvpValues && settings.filterPokemonByPvpValues && !settings.noFilterPvpValuesPokemon.has(pokemon.pokemon_id)) {
+        if (pokemon.pvp != null) {
+            pokemon.pvp.great.forEach((data) => {
+                if (data.rank >= settings.minSuper && data.rank <= settings.maxSuper) {
+                    passPVP = true
+                }
+            })
+            pokemon.pvp.ultra.forEach((data) => {
+                if (data.rank >= settings.minUltra && data.rank <= settings.maxUltra) {
+                    passPVP = true
+                }
+            })
+        }
+    }
+    const pvpfilteringEnabled = (settings.showPokemonPvpValues && settings.filterPokemonByPvpValues)
+    const ivfilteringEnabled = (settings.showPokemonValues && settings.filterPokemonByValues)
+    if (!ivfilteringEnabled && pvpfilteringEnabled && !passPVP && settings.noFilterPvpValuesPokemon.has(pokemon.pokemon_id)) {
+        passPVP = true
+    }
+    if (!pvpfilteringEnabled && ivfilteringEnabled && !passIV && settings.noFilterValuesPokemon.has(pokemon.pokemon_id)) {
+        passIV = true
+    }
+    if (settings.noFilterValuesPokemon.has(pokemon.pokemon_id) && settings.noFilterPvpValuesPokemon.has(pokemon.pokemon_id)) {
+        passIV = true
+        passPVP = true
+    }
+
+    if (!(passIV || (passPVP)) && (pvpfilteringEnabled || ivfilteringEnabled)) {
+        return false
     }
 
     if (settings.excludeNearbyCells && pokemon.seen_type === 'nearby_cell') {
@@ -166,6 +198,7 @@ function pokemonLabel(item) {
     var verifiedDisplay = ''
     var typesDisplay = ''
     var statsDisplay = ''
+    var pvpDisplay = ''
     var nearbyStopWarning = ''
 
     if (id === 29 || id === 32) {
@@ -251,6 +284,7 @@ function pokemonLabel(item) {
               ${catchRatesDisplay}
             </div>`
 
+
         let rarityDisplay = ''
         if (serverSettings.rarity) {
             const rarityName = getPokemonRarityName(item.pokemon_id)
@@ -277,6 +311,31 @@ function pokemonLabel(item) {
               ${rarityDisplay}<strong>Gen ${gen}</strong>
             </div>`
     }
+    if (item.pvp != null && settings.showPokemonPvpValues) {
+        var superDisplay = ''
+        var ultraDisplay = ''
+        if (item.pvp.great.length > 0) {
+            superDisplay = `<div>${i18n('Great league')}:`
+            item.pvp.great.forEach((data) => {
+                superDisplay += `<br> <strong>${getPokemonName(data.pokemon)} #${data.rank}(${data.percentage}%) ${data.cp} ${i18n('CP')}</strong>`
+            })
+            superDisplay += '</div>'
+        }
+
+        if (item.pvp.ultra.length > 0) {
+            ultraDisplay = `<div>${i18n('Ultra league')}:`
+            item.pvp.ultra.forEach((data) => {
+                ultraDisplay += `<br> <strong>${getPokemonName(data.pokemon)} #${data.rank}(${data.percentage}%) ${data.cp} ${i18n('CP')}</strong>`
+            })
+            ultraDisplay += '</div>'
+        }
+
+        pvpDisplay = `
+        <div class='info-container'>
+            ${superDisplay}
+            ${ultraDisplay}
+        </div>`
+    }
 
     const notifText = settings.notifPokemon.has(id) ? i18n('Don\'t notify') : i18n('Notify')
     const notifIconClass = settings.notifPokemon.has(id) ? 'fas fa-bell-slash' : 'fas fa-bell'
@@ -301,6 +360,7 @@ function pokemonLabel(item) {
                 ${timestampToTime(disappearTime)} (<span class='label-countdown' disappears-at='${disappearTime}'>00m00s</span>) ${verifiedDisplay}
               </div>
               ${statsDisplay}
+              ${pvpDisplay}
               ${genRarityDisplayRight}
               <div class='coordinates'>
                 ${nearbyStopWarning}
@@ -341,7 +401,7 @@ function processPokemon(pokemon) {
             sendPokemonNotification(pokemon)
         }
 
-        pokemon.marker = createPokemonMarker(pokemon, serverSettings.generateImages)
+        pokemon.marker = createPokemonMarker(pokemon, serverSettings.generateImages, serverSettings.pokemonGlowing)
         customizePokemonMarker(pokemon, pokemon.marker, isNotifPoke)
 
         if (isPokemonRangesActive()) {

@@ -121,6 +121,12 @@ def get_args(access_config=None):
     parser.add_argument('-npv', '--no-pokemon-values',
                         help='Disables pokemon values.',
                         action='store_true', default=False)
+    parser.add_argument('-npg', '--no-pokemon-glowing',
+                        help='Disables the glowing of pokemon.',
+                        action='store_true', default=False)
+    parser.add_argument('-pvp', '--pvp-values',
+                        help='Enables pokemon pvp values.',
+                        action='store_true', default=False)
     parser.add_argument('-cr', '--catch-rates',
                         action='store_true',
                         help='Show catch rates for all three balls.')
@@ -445,6 +451,9 @@ def get_args(access_config=None):
                         help=('Use ImageMagick to generate dynamic '
                               'icons on demand.'),
                         action='store_true', default=False)
+    parser.add_argument('-prepvp', '--pregenerate-pvp',
+                        help=('Pregenerate PVP rank data before the map launches.'),
+                        action='store_true', default=False)
     parser.add_argument('-pa', '--pogo-assets', default=None,
                         help=('Directory pointing to optional '
                               'PogoAssets root directory.'))
@@ -631,6 +640,8 @@ def get_args(access_config=None):
             'no_geocoder',
             'no_pokemon',
             'no_pokemon_values',
+            'no_pokemon_glowing',
+            'pvp_values',
             'catch_rates',
             'rarity',
             'upscaled_pokemon',

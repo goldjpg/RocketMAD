@@ -237,10 +237,34 @@ function getPokemonLevel(cpMultiplier) {
     return pokemonLevel
 }
 
-function createPokemonMarker(pokemon, generateImages) {
-    const icon = L.contentIcon({
-        iconUrl: getPokemonMapIconUrl(pokemon, generateImages),
-        iconSize: [32, 32]
+function createPokemonMarker(pokemon, generateImages, glowing) {
+    var html = '<img src="' + getPokemonMapIconUrl(pokemon, generateImages) + '" style="width:100%;height:100%;'
+    var perfectPVP = false
+    if (pokemon.pvp != null) {
+        pokemon.pvp.great.forEach((data) => {
+            if (data.rank === 1) {
+                perfectPVP = true
+            }
+        })
+        pokemon.pvp.ultra.forEach((data) => {
+            if (data.rank === 1) {
+                perfectPVP = true
+            }
+        })
+    }
+    if (glowing) {
+        if (getIvsPercentage(pokemon.individual_attack, pokemon.individual_defense, pokemon.individual_stamina) === 100) {
+            html += 'filter:drop-shadow(0 0 10px red)drop-shadow(0 0 10px red);-webkit-filter:drop-shadow(0 0 10px red)drop-shadow(0 0 10px red);'
+        } else if (perfectPVP) {
+            html += 'filter:drop-shadow(0 0 10px blue)drop-shadow(0 0 10px blue);-webkit-filter:drop-shadow(0 0 10px blue)drop-shadow(0 0 10px blue);'
+        }
+    }
+
+    html += '"/>'
+    const icon = L.divIcon({
+        html: html,
+        iconSize: [32, 32],
+        className: 'leaflet-div-pokemon'
     })
 
     let offsetLat = 0

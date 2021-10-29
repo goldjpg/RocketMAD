@@ -17,6 +17,7 @@ from flask_session import Session
 from functools import wraps
 from s2sphere import LatLng
 
+from rocketmad.PvpUtils import load_data
 from .auth.auth_factory import AuthFactory
 from .blacklist import fingerprints
 from .dyn_img import ImageGenerator
@@ -139,6 +140,7 @@ def create_app():
     app.config['SQLALCHEMY_POOL_RECYCLE'] = args.db_pool_recycle
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
+    load_data(args.pregenerate_pvp)
 
     if args.client_auth:
         app.config['SESSION_TYPE'] = 'redis'
@@ -220,6 +222,9 @@ def create_app():
                 if user_args.upscaled_pokemon is not None else []),
             'pokemonValues': (not user_args.no_pokemon
                               and not user_args.no_pokemon_values),
+            'pokemonGlowing': (not user_args.no_pokemon_glowing),
+            'pokemonPVP': (not user_args.no_pokemon
+                              and user_args.pvp_values),
             'catchRates': user_args.catch_rates,
             'rarity': (not user_args.no_pokemon and user_args.rarity
                        and user_args.rarity_update_frequency),
@@ -800,6 +805,7 @@ def create_app():
 
         if pokemon:
             verified_despawn = user_args.verified_despawn_time
+            include_pvp = user_args.pvp_values and request.args.get('pvp') == 'true'
             eids = None
             ids = None
             if (request.args.get('eids')
@@ -819,7 +825,7 @@ def create_app():
                         geofences=geofences,
                         exclude_geofences=exclude_geofences,
                         verified_despawn_time=verified_despawn,
-                        exclude_nearby_cells=exclude_nearby_cells))
+                        exclude_nearby_cells=exclude_nearby_cells, include_pvp=include_pvp))
             else:
                 # If map is already populated only request modified Pokemon
                 # since last request time.
@@ -829,7 +835,7 @@ def create_app():
                         eids=eids, ids=ids, geofences=geofences,
                         exclude_geofences=exclude_geofences,
                         verified_despawn_time=verified_despawn,
-                        exclude_nearby_cells=exclude_nearby_cells))
+                        exclude_nearby_cells=exclude_nearby_cells, include_pvp=include_pvp))
 
                 if new_area:
                     # If screen is moved add newly uncovered Pokemon to the
@@ -842,7 +848,7 @@ def create_app():
                                 eids=eids, ids=ids, geofences=geofences,
                                 exclude_geofences=exclude_geofences,
                                 verified_despawn_time=verified_despawn,
-                                exclude_nearby_cells=exclude_nearby_cells)))
+                                exclude_nearby_cells=exclude_nearby_cells, include_pvp=include_pvp)))
 
             if request.args.get('reids'):
                 request_reids = request.args.get('reids').split(',')
@@ -852,7 +858,7 @@ def create_app():
                                        geofences=geofences,
                                        exclude_geofences=exclude_geofences,
                                        verified_despawn_time=verified_despawn,
-                                       exclude_nearby_cells=exclude_nearby_cells))
+                                       exclude_nearby_cells=exclude_nearby_cells, include_pvp=include_pvp))
                 d['reids'] = reids
 
         if seen:
