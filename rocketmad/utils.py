@@ -302,6 +302,9 @@ def get_args(access_config=None):
                         type=int, default=2500,
                         help='Interval between raw-data requests (map '
                              'updates) in milliseconds.'),
+    parser.add_argument('-nsb', '--no-share-button',
+                        help='Disables the share-button on RocketApp clients',
+                        action='store_true', default=False),
 
     group = parser.add_argument_group('Tile server')
     group.add_argument('-TSc', '--custom-tile-servers',
@@ -638,6 +641,7 @@ def get_args(access_config=None):
             'no_autopan_popup',
             'lock_start_marker',
             'no_geocoder',
+            'no_share_button',
             'no_pokemon',
             'no_pokemon_values',
             'no_pokemon_glowing',

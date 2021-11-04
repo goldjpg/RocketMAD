@@ -38,6 +38,7 @@
 #no-autopan-popup               # Enable if you don't want the map to do a panning animation to fit opened popups on mobile devices. (default=False)
 #lock-start-marker              # Disables dragging the start marker and hence disables changing the start position. (default=False)
 #no-geocoder                    # Do not add the geocoder (location search bar) to the map. (default=False)
+#no-share-button                # Disables the share-button on RocketApp clients
 
 #no-pokemon                     # Disables pokemon. (default=False)
 #no-pokemon-values              # Disables pokemon values. (ivs, cp, moves, etc.) (default=False)

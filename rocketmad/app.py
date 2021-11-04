@@ -255,7 +255,8 @@ def create_app():
             'nestParks': user_args.nest_parks,
             'nestParksFileName': user_args.nest_parks_filename,
             'exParks': user_args.ex_parks,
-            'exParksFileName': user_args.ex_parks_filename
+            'exParksFileName': user_args.ex_parks_filename,
+            'shareButton': not user_args.no_share_button
         }
 
         return render_template(
