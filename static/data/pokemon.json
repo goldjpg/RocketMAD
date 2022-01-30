@@ -2961,6 +2961,10 @@
       "1049": {
         "formName": "Purified",
         "assetId": "00"
+      },
+      "2728": {
+        "formName": "Hisuian",
+        "assetId": "00"
       }
     }
   },
@@ -2984,6 +2988,10 @@
       },
       "1052": {
         "formName": "Purified",
+        "assetId": "00"
+      },
+      "2735": {
+        "formName": "Hisuian",
         "assetId": "00"
       }
     }
