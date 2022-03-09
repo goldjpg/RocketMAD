@@ -576,7 +576,7 @@ function getPokestopIconUrlFiltered(pokestop) {
     var lure = 0
     var questquery = ''
     var count = 1
-    const quests = [pokestop.quest, pokestop.quest_ar]
+    const quests = [pokestop.quest_ar, pokestop.quest]
     quests.forEach((quest) => {
         if (isPokestopMeetsQuestFilters(quest, quest === pokestop.quest_ar)) {
             questquery += `&reward${count + '=' + quest.reward_type}&item${count + '=' + quest.item_id}&mon${count + '=' + quest.pokemon_id}&form${count + '=' + quest.form_id}&costume${count + '=' + quest.costume_id}`
