@@ -6,7 +6,7 @@ settingsSideNav:writable, startFollowingUser, startLocationMarker,
 stopFollowingUser, updateExParks, updateGyms, updateNestParks, updateNests,
 updateMap, updatePokestops, updatePokemons, updateS2Overlay,
 updateScannedLocations, updateSpawnpoints, updateStartLocationMarker,
-updateUserLocationMarker, updateWeatherButton, updateWeathers, setQuestFormFilter
+updateUserLocationMarker, updateWeatherButton, updateWeathers, setQuestFormFilter, setQuestLayerFilter
 */
 /* exported initBackupModals, initInvasionFilters, initItemFilters, initPokemonFilters, initSettings, initSettingsSidebar */
 
@@ -96,6 +96,7 @@ function initSettings() {
         settings.filterQuests = Store.get('filterQuests')
         settings.excludedQuestPokemon = Store.get('excludedQuestPokemon')
         settings.questFormFilter = Store.get('questFormFilter')
+        settings.questLayerFilter = Store.get('questLayerFilter')
         settings.excludedQuestItems = Store.get('excludedQuestItems')
         settings.questNotifs = Store.get('questNotifs')
         settings.notifQuestPokemon = Store.get('notifQuestPokemon')
@@ -1435,6 +1436,11 @@ function initSettingsSidebar() {
         Store.set('questFormFilter', this.value)
     })
 
+    $('#quest-layer-filter').on('change', function () {
+        setQuestLayerFilter(this.value)
+        Store.set('questLayerFilter', this.value)
+    })
+
     $('#map-service-provider-select').on('change', function () {
         settings.mapServiceProvider = this.value
         if (settings.showPokemon) {
@@ -1598,6 +1604,7 @@ function initSettingsSidebar() {
         $('#filter-quests-switch').prop('checked', settings.filterQuests)
         $('a[data-target="quest-filter-modal"]').toggle(settings.filterQuests)
         $('#quest-form-filter').val(settings.questFormFilter)
+        $('#quest-layer-filter').val(settings.questLayerFilter)
     }
     if (serverSettings.invasions) {
         $('#invasion-switch').prop('checked', settings.showInvasions)

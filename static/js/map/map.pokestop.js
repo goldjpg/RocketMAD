@@ -7,14 +7,20 @@ pokestopZIndex, removeMarker, removeRangeCircle, sendNotification, settings,
 setupRangeCircle, updateLabelDiffTime, updateRangeCircle, updateMarkerLayer,
 filterManagers, updateMap
 */
-/* exported processPokestop, setQuestFormFilter */
+/* exported processPokestop, setQuestFormFilter, setQuestLayerFilter */
 
-function isPokestopMeetsQuestFilters(quest) {
+function isPokestopMeetsQuestFilters(quest, isAr) {
     if (!settings.showQuests || !quest) {
         return false
     }
 
     if (settings.filterQuests) {
+        if(isAr && settings.questLayerFilter === 'onlyNormal'){
+            return false
+        } else if(!isAr && settings.questLayerFilter === 'onlyAr'){
+            return false
+        }
+
         switch (quest.reward_type) {
             case 2: {
                 const id = quest.item_id + '_' + quest.item_amount
@@ -74,9 +80,9 @@ function isPokestopMeetsFilters(pokestop) {
         }
     }
 
-    return settings.showPokestopsNoEvent || isPokestopMeetsQuestFilters(pokestop.quest) ||
+    return settings.showPokestopsNoEvent || isPokestopMeetsQuestFilters(pokestop.quest, false) ||
         isPokestopMeetsInvasionFilters(pokestop) || isPokestopMeetsLureFilters(pokestop) ||
-        isPokestopMeetsQuestFilters(pokestop.quest_ar)
+        isPokestopMeetsQuestFilters(pokestop.quest_ar, true)
 }
 
 function isPokestopRangesActive() {
@@ -104,7 +110,7 @@ function setupPokestopMarker(pokestop, isNotifPokestop) {
 function updatePokestopMarker(pokestop, marker, isNotifPokestop) {
     const upscaleModifier = isNotifPokestop && settings.upscaleNotifMarkers ? 1.3 : 1
 
-    const hasQuest = (isPokestopMeetsQuestFilters(pokestop.quest) || isPokestopMeetsQuestFilters(pokestop.quest_ar)) && serverSettings.generateImages
+    const hasQuest = (isPokestopMeetsQuestFilters(pokestop.quest, false) || isPokestopMeetsQuestFilters(pokestop.quest_ar, true)) && serverSettings.generateImages
     const iconWidth = hasQuest ? 55 : 32
     const iconHeight = hasQuest ? 48 : 32
     const questOffset = hasQuest ? 8 : 0
@@ -158,11 +164,11 @@ function pokestopLabel(pokestop) {
         imageClass = 'pokestop-icon'
     }
     const quest = pokestop.quest
-    if (isPokestopMeetsQuestFilters(quest)) {
+    if (isPokestopMeetsQuestFilters(quest, false)) {
         questDisplay = getQuestLabel(pokestop, false)
     }
     const questAr = pokestop.quest_ar
-    if (isPokestopMeetsQuestFilters(questAr)) {
+    if (isPokestopMeetsQuestFilters(questAr, true)) {
         questarDisplay = getQuestLabel(pokestop, true)
     }
 
@@ -518,6 +524,12 @@ function setQuestFormFilter(name) {
     updateMap({ loadAllPokestops: true })
 }
 
+function setQuestLayerFilter(name) {
+    settings.questLayerFilter = name
+    updatePokestops()
+    updateMap({ loadAllPokestops: true })
+}
+
 function removePokestopMarker(id) { // eslint-disable-line no-unused-vars
     removeMarker(mapData.pokestops[id].marker)
 }
@@ -566,7 +578,7 @@ function getPokestopIconUrlFiltered(pokestop) {
     var count = 1
     const quests = [pokestop.quest, pokestop.quest_ar]
     quests.forEach((quest) => {
-        if (isPokestopMeetsQuestFilters(quest)) {
+        if (isPokestopMeetsQuestFilters(quest, quest === pokestop.quest_ar)) {
             questquery += `&reward${count + '=' + quest.reward_type}&item${count + '=' + quest.item_id}&mon${count + '=' + quest.pokemon_id}&form${count + '=' + quest.form_id}&costume${count + '=' + quest.costume_id}`
         } else {
             questquery += `&reward${count}=0`
@@ -635,9 +647,9 @@ function getPokestopNotificationInfo(pokestop) {
     if (settings.pokestopNotifs) {
         const id = pokestop.pokestop_id
         if (settings.questNotifs) {
-            if (isPokestopMeetsQuestFilters(pokestop.quest)) {
+            if (isPokestopMeetsQuestFilters(pokestop.quest, false)) {
                 filterQuestNotification(pokestop.quest)
-            } else if (isPokestopMeetsQuestFilters(pokestop.quest_ar)) {
+            } else if (isPokestopMeetsQuestFilters(pokestop.quest_ar, true)) {
                 filterQuestNotification(pokestop.quest_ar)
             }
         }
