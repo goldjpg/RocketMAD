@@ -420,9 +420,9 @@ class Gym(db.Model):
                         FROM   cev_gympokemon gp2
                         WHERE  gp2.gym_id = %s
                         GROUP  BY gp2.gym_id
-                   ) AND gp.gym_id = %s
+                   )
             ORDER  BY gp.deployed DESC;
-        """, [gym_id, gym_id])
+        """, [gym_id])
 
         for row in query_result:
             p = {}
