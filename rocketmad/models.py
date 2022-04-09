@@ -404,15 +404,26 @@ class Gym(db.Model):
         return gyms
 
     @staticmethod
-    def get_gym(gymid, include_trainers=True):
+    def get_gym(gym_id, include_trainers=True):
 
         result = []
 
         # I was too lost to use the models here with this complex query so please someone help...
-        querryresult = db.engine.execute(
-            "select * from cev_gympokemon gp left join cev_trainer_pokemon tp on tp.uuid = gp.pokemon_uuid where (gp.gym_id, gp.last_seen) in (select gp2.gym_id, max(gp2.last_seen) from cev_gympokemon gp2 group by gp2.gym_id) and gp.gym_id = '" + gymid + "' order by gp.deployed desc")
+        query_result = db.engine.execute("""
+            SELECT *
+            FROM   cev_gympokemon gp
+                   LEFT JOIN cev_trainer_pokemon tp
+                          ON tp.uuid = gp.pokemon_uuid
+            WHERE  (gp.gym_id, gp.last_seen) IN (
+                        SELECT gp2.gym_id,
+                               Max(gp2.last_seen)
+                        FROM   cev_gympokemon gp2
+                        GROUP  BY gp2.gym_id
+                   ) AND gp.gym_id = '""" + gym_id + """'
+            ORDER  BY gp.deployed DESC;
+        """)
 
-        for row in querryresult:
+        for row in query_result:
             p = {}
             if include_trainers:
                 p["trainer"] = row[0]
