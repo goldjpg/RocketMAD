@@ -419,9 +419,9 @@ class Gym(db.Model):
                                Max(gp2.last_seen)
                         FROM   cev_gympokemon gp2
                         GROUP  BY gp2.gym_id
-                   ) AND gp.gym_id = '""" + gym_id + """'
+                   ) AND gp.gym_id = %s
             ORDER  BY gp.deployed DESC;
-        """)
+        """, [gym_id])
 
         for row in query_result:
             p = {}
