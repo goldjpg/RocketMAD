@@ -307,6 +307,10 @@ const StoreOptions = {
         default: 'Any',
         type: StoreTypes.String
     },
+    questLayerFilter: {
+        default: '',
+        type: StoreTypes.String
+    },
     excludedQuestPokemon: {
         default: new Set(),
         type: StoreTypes.Set
