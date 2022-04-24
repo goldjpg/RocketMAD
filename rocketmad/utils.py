@@ -121,9 +121,6 @@ def get_args(access_config=None):
     parser.add_argument('-npv', '--no-pokemon-values',
                         help='Disables pokemon values.',
                         action='store_true', default=False)
-    parser.add_argument('-npg', '--no-pokemon-glowing',
-                        help='Disables the glowing of pokemon.',
-                        action='store_true', default=False)
     parser.add_argument('-pvp', '--pvp-values',
                         help='Enables pokemon pvp values.',
                         action='store_true', default=False)
@@ -656,7 +653,6 @@ def get_args(access_config=None):
             'no_share_button',
             'no_pokemon',
             'no_pokemon_values',
-            'no_pokemon_glowing',
             'pvp_values',
             'catch_rates',
             'rarity',
