@@ -135,6 +135,42 @@ const StoreOptions = {
         default: 100,
         type: StoreTypes.Number
     },
+    scaleByValues: {
+        default: true,
+        type: StoreTypes.Boolean
+    },
+    highlightPokemon: {
+        default: true,
+        type: StoreTypes.Boolean
+    },
+    highlightColorPerfect: {
+        default: '#5500ff',
+        type: StoreTypes.String
+    },
+    highlightColorIV: {
+        default: '#ff0000',
+        type: StoreTypes.String
+    },
+    highlightColorLevel: {
+        default: '#00cc00',
+        type: StoreTypes.String
+    },
+    highlightThresholdIV: {
+        default: 90,
+        type: StoreTypes.Number
+    },
+    highlightThresholdLevel: {
+        default: 30,
+        type: StoreTypes.Number
+    },
+    highlightRadius: {
+        default: 15,
+        type: StoreTypes.Number
+    },
+    highlightSize: {
+        default: 30,
+        type: StoreTypes.Number
+    },
     includedRarities: {
         default: [1, 2, 3, 4, 5, 6], // Common ... New Spawn
         type: StoreTypes.JSON
@@ -268,7 +304,7 @@ const StoreOptions = {
         type: StoreTypes.Boolean
     },
     includedRaidLevels: {
-        default: [1, 2, 3, 4, 5, 6],
+        default: [1, 2, 3, 4, 5, 6, 7],
         type: StoreTypes.JSON
     },
     raidNotifs: {
@@ -518,34 +554,54 @@ const StoreOptions = {
     zoomLevel: {
         default: 16,
         type: StoreTypes.Number
+    },
+    savedSettings: {
+        default: {},
+        type: StoreTypes.JSON
     }
 }
 
 const Store = {
     getOption: function (key) {
-        var option = StoreOptions[key]
+        const option = StoreOptions[key]
         if (!option) {
             throw new Error('Store key was not defined ' + key)
         }
         return option
     },
     get: function (key) {
-        var option = this.getOption(key)
-        var optionType = option.type
-        var rawValue = localStorage[key]
+        const option = this.getOption(key)
+        const optionType = option.type
+        const rawValue = localStorage[key]
         if (rawValue === null || rawValue === undefined) {
             return option.default
         }
-        var value = optionType.parse(rawValue)
-        return value
+        return optionType.parse(rawValue)
     },
     set: function (key, value) {
-        var option = this.getOption(key)
-        var optionType = option.type || StoreTypes.String
-        var rawValue = optionType.stringify(value)
+        const option = this.getOption(key)
+        const optionType = option.type || StoreTypes.String
+        const rawValue = optionType.stringify(value)
         localStorage[key] = rawValue
     },
     reset: function (key) {
         localStorage.removeItem(key)
+    },
+    dump: function () {
+        const dump = {}
+        for (const key in StoreOptions) {
+            if (key === 'savedSettings') continue
+            if (StoreOptions[key].type === StoreTypes.Set) {
+                dump[key] = Array.from(Store.get(key))
+            } else {
+                dump[key] = Store.get(key)
+            }
+        }
+        return dump
+    },
+    restore: function (dump) {
+        for (const key in dump) {
+            Store.set(key, dump[key])
+        }
     }
 }

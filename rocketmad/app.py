@@ -223,7 +223,6 @@ def create_app():
                 if user_args.upscaled_pokemon is not None else []),
             'pokemonValues': (not user_args.no_pokemon
                               and not user_args.no_pokemon_values),
-            'pokemonGlowing': (not user_args.no_pokemon_glowing),
             'pokemonPVP': (not user_args.no_pokemon
                               and user_args.pvp_values),
             'catchRates': user_args.catch_rates,
@@ -257,7 +256,9 @@ def create_app():
             'nestParksFileName': user_args.nest_parks_filename,
             'exParks': user_args.ex_parks,
             'exParksFileName': user_args.ex_parks_filename,
-            'shareButton': not user_args.no_share_button
+            'shareButton': not user_args.no_share_button,
+            'highlightPokemon': user_args.highlight_pokemon.lower(),
+            'perfectCircle': user_args.perfect_circle
         }
 
         return render_template(
@@ -1064,6 +1065,8 @@ def create_app():
         evolution = int(request.args.get('evolution', '0'))
         shiny = 'shiny' in request.args
         weather = int(request.args.get('weather', '0'))
+        perfect = request.args.get('perfect', None)
+
 
         if raw:
             filename = image_generator.get_pokemon_raw_icon(
@@ -1072,7 +1075,7 @@ def create_app():
         else:
             filename = image_generator.get_pokemon_map_icon(
                 pkm, gender=gender, form=form, costume=costume,
-                evolution=evolution, weather=weather)
+                evolution=evolution, weather=weather, perfect=perfect)
         return send_file(filename, mimetype='image/png')
 
     @app.route('/gym_img')
