@@ -22,11 +22,11 @@
   },
   "6": {
     "name": "Stardust",
-    "questBundles": [200, 250, 500, 800, 1000, 1200, 1500, 3500]
+    "questBundles": [200, 250, 500, 750, 800, 1000, 1200, 1500, 3500]
   },
   "7": {
     "name": "Mega Energy",
-    "questBundles": [5, 10, 15, 20, 25]
+    "questBundles": [5, 10, 15, 20, 25, 50]
   },
   "8": {
     "name": "Candy",

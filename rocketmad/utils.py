@@ -121,9 +121,6 @@ def get_args(access_config=None):
     parser.add_argument('-npv', '--no-pokemon-values',
                         help='Disables pokemon values.',
                         action='store_true', default=False)
-    parser.add_argument('-npg', '--no-pokemon-glowing',
-                        help='Disables the glowing of pokemon.',
-                        action='store_true', default=False)
     parser.add_argument('-pvp', '--pvp-values',
                         help='Enables pokemon pvp values.',
                         action='store_true', default=False)
@@ -265,6 +262,13 @@ def get_args(access_config=None):
     parser.add_argument('-pc', '--pokemon-cries',
                         help='Play cries for pokemon notifications.',
                         action='store_true', default=False)
+
+    parser.add_argument('-hp', '--highlight-pokemon', default='',
+                        help='Highlight pokemon on the map using the stated way. Options: svg / css')
+    parser.add_argument('-pfc', '--perfect-circle',
+                        help='Add circle symbol with "100" similar to the weather one for perfect IV pokemon.',
+                        action='store_true', default=False)
+
     parser.add_argument('-mt', '--map-title', default='RocketMAD',
                         help=('The title of the map. Default: RocketMAD'))
     parser.add_argument('-cfi', '--custom-favicon',
@@ -649,7 +653,6 @@ def get_args(access_config=None):
             'no_share_button',
             'no_pokemon',
             'no_pokemon_values',
-            'no_pokemon_glowing',
             'pvp_values',
             'catch_rates',
             'rarity',
@@ -658,6 +661,8 @@ def get_args(access_config=None):
             'verified_despawn_time',
             'show_all_zoom_level',
             'pokemon_cries',
+            'highlight_pokemon',
+            'perfect_circle',
             'no_gyms',
             'no_gym_sidebar',
             'no_gym_filters',
