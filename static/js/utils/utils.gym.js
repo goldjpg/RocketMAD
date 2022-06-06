@@ -8,7 +8,8 @@ const raidEggImages = {
     4: 'egg_rare.png',
     5: 'egg_legendary.png',
     6: 'egg_mega.png',
-    7: 'egg_legendary_mega.png'
+    7: 'egg_legendary_mega.png',
+    8: 'ultra_wormhole.png'
 }
 
 function getGymLevel(gym) {
