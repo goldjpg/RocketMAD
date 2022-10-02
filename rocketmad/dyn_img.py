@@ -372,6 +372,8 @@ class ImageGenerator:
     def _quest_reward(self, reward_type, item_id, pokemon_id, form_id, costume_id, is_ar):
         imgSize = 55
         imgPath = path_item / "0.png"
+        if reward_type == 1:
+            imgPath = path_item / "9.png"
         if reward_type == 2:
             imgPath = path_item / (str(item_id) + ".png")
         elif reward_type == 3:
